@@ -108,8 +108,9 @@ data "aws_iam_policy_document" "datadog_integration_policy" {
 
 module "datadog_integration_role" {
   providers     = { aws = aws }
-  source        = "github.com/schubergphilis/terraform-aws-mcaf-role?ref=v0.1.5"
+  source        = "github.com/schubergphilis/terraform-aws-mcaf-role?ref=v0.1.6"
   name          = local.datadog_integration_role_name
+  postfix       = false
   assume_policy = data.aws_iam_policy_document.datadog_integration_assume_role.json
   role_policy   = data.aws_iam_policy_document.datadog_integration_policy.json
   tags          = var.tags
