@@ -1,7 +1,7 @@
 variable "datadog_tags" {
   type        = list(string)
   default     = []
-  description = "Tags (format of key:value) to add to all metrics retrieved from the datadog aws integration"
+  description = "Array of tags (in the form key:value) to add to all hosts and metrics"
 }
 
 variable "tags" {
