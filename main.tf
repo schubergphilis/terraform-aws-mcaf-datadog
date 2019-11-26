@@ -11,8 +11,8 @@ data "aws_caller_identity" "current" {}
 resource "datadog_integration_aws" "default" {
   account_id = data.aws_caller_identity.current.account_id
   role_name  = local.datadog_integration_role_name
+  host_tags  = var.datadog_tags
 }
-
 
 data "aws_iam_policy_document" "datadog_integration_assume_role" {
   statement {
