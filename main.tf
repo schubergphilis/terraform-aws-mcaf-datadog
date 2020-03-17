@@ -95,6 +95,8 @@ data "aws_iam_policy_document" "datadog_integration_policy" {
       "sns:List*",
       "sns:Publish",
       "sqs:ListQueues",
+      "states:DescribeStateMachine",
+      "states:ListStateMachines",
       "support:*",
       "tag:GetResources",
       "tag:GetTagKeys",
