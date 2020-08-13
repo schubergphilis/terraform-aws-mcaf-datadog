@@ -3,9 +3,6 @@ locals {
   datadog_aws_account_id        = "464622532012"
 }
 
-provider "aws" {}
-provider "datadog" {}
-
 data "aws_caller_identity" "current" {}
 
 resource "datadog_integration_aws" "default" {
