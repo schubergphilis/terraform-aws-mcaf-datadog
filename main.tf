@@ -19,6 +19,7 @@ data "aws_iam_policy_document" "datadog_integration_assume_role" {
       type        = "AWS"
       identifiers = ["arn:aws:iam::${local.datadog_aws_account_id}:root"]
     }
+
     condition {
       test     = "StringEquals"
       variable = "sts:ExternalId"
@@ -43,11 +44,11 @@ data "aws_iam_policy_document" "datadog_integration_policy" {
       "cloudwatch:Describe*",
       "cloudwatch:Get*",
       "cloudwatch:List*",
-      "codedeploy:List*",
       "codedeploy:BatchGet*",
+      "codedeploy:List*",
       "directconnect:Describe*",
-      "dynamodb:List*",
       "dynamodb:Describe*",
+      "dynamodb:List*",
       "ec2:Describe*",
       "ecs:Describe*",
       "ecs:List*",
@@ -55,34 +56,34 @@ data "aws_iam_policy_document" "datadog_integration_policy" {
       "elasticache:List*",
       "elasticfilesystem:Describe*",
       "elasticloadbalancing:Describe*",
-      "elasticmapreduce:List*",
       "elasticmapreduce:Describe*",
-      "es:ListTags",
-      "es:ListDomainNames",
+      "elasticmapreduce:List*",
       "es:DescribeElasticsearchDomains",
-      "health:DescribeEvents",
-      "health:DescribeEventDetails",
+      "es:ListDomainNames",
+      "es:ListTags",
       "health:DescribeAffectedEntities",
-      "kinesis:List*",
+      "health:DescribeEventDetails",
+      "health:DescribeEvents",
       "kinesis:Describe*",
+      "kinesis:List*",
       "lambda:AddPermission",
       "lambda:GetPolicy",
       "lambda:List*",
       "lambda:RemovePermission",
-      "logs:Get*",
-      "logs:Describe*",
-      "logs:FilterLogEvents",
-      "logs:TestMetricFilter",
-      "logs:PutSubscriptionFilter",
       "logs:DeleteSubscriptionFilter",
+      "logs:Describe*",
       "logs:DescribeSubscriptionFilters",
+      "logs:FilterLogEvents",
+      "logs:Get*",
+      "logs:PutSubscriptionFilter",
+      "logs:TestMetricFilter",
       "rds:Describe*",
       "rds:List*",
       "redshift:DescribeClusters",
       "redshift:DescribeLoggingStatus",
       "route53:List*",
-      "s3:GetBucketLogging",
       "s3:GetBucketLocation",
+      "s3:GetBucketLogging",
       "s3:GetBucketNotification",
       "s3:GetBucketTagging",
       "s3:ListAllMyBuckets",
@@ -98,7 +99,7 @@ data "aws_iam_policy_document" "datadog_integration_policy" {
       "tag:GetTagKeys",
       "tag:GetTagValues",
       "xray:BatchGetTraces",
-      "xray:GetTraceSummaries"
+      "xray:GetTraceSummaries",
     ]
     resources = ["*"]
   }
