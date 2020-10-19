@@ -108,7 +108,6 @@ data "aws_iam_policy_document" "datadog_integration_policy" {
 }
 
 module "datadog_integration_role" {
-  providers     = { aws = aws }
   source        = "github.com/schubergphilis/terraform-aws-mcaf-role?ref=v0.3.0"
   name          = local.datadog_integration_role_name
   postfix       = false
