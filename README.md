@@ -23,6 +23,7 @@
 | install\_log\_forwarder | Set to true to install the Datadog Log Forwarder (requires var.api\_key to be set) | `bool` | `false` | no |
 | log\_forwarder\_name | AWS log forwarder lambda name | `string` | `"datadog-forwarder"` | no |
 | log\_forwarder\_version | AWS log forwarder version to install | `string` | `"latest"` | no |
+| site\_url | Datadog region used | `string` | `"datadoghq.com"` | no |
 
 ## Outputs
 
