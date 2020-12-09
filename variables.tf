@@ -30,8 +30,8 @@ variable "log_forwarder_version" {
 
 variable "site_url" {
   type        = string
-  default     = "datadoghq.com"
-  description = "Define your Datadog Site to send data to. For the Datadog EU site, set to datadoghq.eu"
+  default     = "datadoghq.eu"
+  description = "Define your Datadog Site to send data to. For the Datadog US site, set to datadoghq.com"
 }
 
 variable "tags" {
