@@ -1,5 +1,5 @@
 # terraform-aws-mcaf-datadog
-
+<!--- BEGIN_TF_DOCS --->
 ## Requirements
 
 | Name | Version |
@@ -23,9 +23,12 @@
 | install\_log\_forwarder | Set to true to install the Datadog Log Forwarder (requires var.api\_key to be set) | `bool` | `false` | no |
 | log\_forwarder\_name | AWS log forwarder lambda name | `string` | `"datadog-forwarder"` | no |
 | log\_forwarder\_version | AWS log forwarder version to install | `string` | `"latest"` | no |
+| site\_url | Define your Datadog Site to send data to. For the Datadog US site, set to datadoghq.com | `string` | `"datadoghq.eu"` | no |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
 | forwarder\_arn | Datadog log forwarder lambda ARN |
+
+<!--- END_TF_DOCS --->

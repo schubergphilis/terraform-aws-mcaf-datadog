@@ -28,6 +28,12 @@ variable "log_forwarder_version" {
   description = "AWS log forwarder version to install"
 }
 
+variable "site_url" {
+  type        = string
+  default     = "datadoghq.eu"
+  description = "Define your Datadog Site to send data to. For the Datadog US site, set to datadoghq.com"
+}
+
 variable "tags" {
   type        = map(string)
   description = "A mapping of tags to assign to the bucket"
