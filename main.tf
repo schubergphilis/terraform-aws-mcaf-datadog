@@ -139,7 +139,7 @@ resource "aws_cloudformation_stack" "datadog_forwarder" {
   parameters = {
     DdApiKey          = "this_value_is_not_used"
     DdApiKeySecretArn = aws_secretsmanager_secret.api_key.0.arn
-    DdTags            = [var.datadog_tags]
+    DdTags            = var.datadog_tags
     DdSite            = var.site_url
     FunctionName      = var.log_forwarder_name
   }
