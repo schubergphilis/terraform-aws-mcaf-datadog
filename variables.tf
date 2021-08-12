@@ -16,6 +16,12 @@ variable "install_log_forwarder" {
   description = "Set to true to install the Datadog Log Forwarder (requires var.api_key to be set)"
 }
 
+variable "log_collection_services" {
+  type        = list(string)
+  default     = null
+  description = "A list of services to collect logs from. See Datadog API docs for a supported list"
+}
+
 variable "log_forwarder_name" {
   type        = string
   default     = "datadog-forwarder"
