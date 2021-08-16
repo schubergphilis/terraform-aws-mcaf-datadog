@@ -160,3 +160,9 @@ resource "datadog_integration_aws_lambda_arn" "default" {
   account_id = data.aws_caller_identity.current.account_id
   lambda_arn = aws_cloudformation_stack.datadog_forwarder.0.outputs["DatadogForwarderArn"]
 }
+
+resource "datadog_integration_aws_log_collection" "default" {
+  count      = var.log_collection_services != null ? 1 : 0
+  account_id = data.aws_caller_identity.current.account_id
+  services   = var.log_collection_services
+}
