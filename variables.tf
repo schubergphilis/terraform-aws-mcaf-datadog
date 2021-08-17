@@ -19,7 +19,7 @@ variable "install_log_forwarder" {
 variable "log_collection_services" {
   type        = list(string)
   default     = null
-  description = "A list of services to collect logs from. See Datadog API docs for a supported list"
+  description = "A list of services to collect logs from. Valid values are s3/elb/elbv2/cloudfront/redshift/lambda."
 }
 
 variable "log_forwarder_name" {
