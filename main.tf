@@ -63,6 +63,8 @@ data "aws_iam_policy_document" "datadog_integration_policy" {
       "es:DescribeElasticsearchDomains",
       "es:ListDomainNames",
       "es:ListTags",
+      "fsx:DescribeFileSystems",
+      "fsx:ListTagsForResource",
       "health:DescribeAffectedEntities",
       "health:DescribeEventDetails",
       "health:DescribeEvents",
