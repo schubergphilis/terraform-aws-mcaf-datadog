@@ -139,11 +139,12 @@ resource "aws_cloudformation_stack" "datadog_forwarder" {
   tags         = var.tags
 
   parameters = {
-    DdApiKey          = "this_value_is_not_used"
-    DdApiKeySecretArn = aws_secretsmanager_secret.api_key.0.arn
-    DdSite            = var.site_url
-    DdTags            = join(",", var.datadog_tags)
-    FunctionName      = var.log_forwarder_name
+    DdApiKey            = "this_value_is_not_used"
+    DdApiKeySecretArn   = aws_secretsmanager_secret.api_key.0.arn
+    DdSite              = var.site_url
+    DdTags              = join(",", var.datadog_tags)
+    FunctionName        = var.log_forwarder_name
+    ReservedConcurrency = var.log_forwarder_reserved_concurrency
   }
 
   // The DdApiKey parameter has the NoEcho tag set in the cfn template, causing
