@@ -30,7 +30,7 @@ variable "log_forwarder_name" {
 
 variable "log_forwarder_reserved_concurrency" {
   type        = number
-  default     = 100
+  default     = null
   description = "AWS log forwarder reserved concurrency"
 }
 
