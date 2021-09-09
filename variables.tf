@@ -28,6 +28,12 @@ variable "log_forwarder_name" {
   description = "AWS log forwarder lambda name"
 }
 
+variable "log_forwarder_reserved_concurrency" {
+  type        = number
+  default     = 100
+  description = "AWS log forwarder reserved concurrency"
+}
+
 variable "log_forwarder_version" {
   type        = string
   default     = "latest"
