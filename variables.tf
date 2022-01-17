@@ -10,6 +10,12 @@ variable "datadog_tags" {
   description = "Array of tags (in the form key:value) to add to all hosts and metrics"
 }
 
+variable "excluded_regions" {
+  type        = list(string)
+  default     = []
+  description = "List of regions to be excluded from metrics collection in Datadog integration"
+}
+
 variable "install_log_forwarder" {
   type        = bool
   default     = false
