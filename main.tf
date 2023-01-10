@@ -123,6 +123,7 @@ module "datadog_integration_role" {
 }
 
 resource "aws_secretsmanager_secret" "api_key" {
+  #checkov:skip=CKV_AWS_149: The cloudformation template provided by datadog does not support KMS CMK
   count       = local.install_log_forwarder
   name        = replace("${var.log_forwarder_name}_api_key", "-", "_")
   description = "Datadog API key used by ${var.log_forwarder_name} lambda"
@@ -135,12 +136,13 @@ resource "aws_secretsmanager_secret_version" "api_key" {
 }
 
 resource "aws_cloudformation_stack" "datadog_forwarder" {
-  count        = local.install_log_forwarder
-  name         = var.log_forwarder_name
-  capabilities = ["CAPABILITY_IAM", "CAPABILITY_NAMED_IAM", "CAPABILITY_AUTO_EXPAND"]
-  on_failure   = "ROLLBACK"
-  template_url = "https://datadog-cloudformation-template.s3.amazonaws.com/aws/forwarder/${var.log_forwarder_version}.yaml"
-  tags         = var.tags
+  count             = local.install_log_forwarder
+  name              = var.log_forwarder_name
+  capabilities      = ["CAPABILITY_IAM", "CAPABILITY_NAMED_IAM", "CAPABILITY_AUTO_EXPAND"]
+  notification_arns = var.log_forwarder_cloudformation_sns_topic
+  on_failure        = "ROLLBACK"
+  template_url      = "https://datadog-cloudformation-template.s3.amazonaws.com/aws/forwarder/${var.log_forwarder_version}.yaml"
+  tags              = var.tags
 
   parameters = {
     DdApiKey            = "this_value_is_not_used"

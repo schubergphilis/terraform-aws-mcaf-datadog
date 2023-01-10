@@ -24,6 +24,7 @@
 | excluded\_regions | List of regions to be excluded from metrics collection in Datadog integration | `list(string)` | `[]` | no |
 | install\_log\_forwarder | Set to true to install the Datadog Log Forwarder (requires var.api\_key to be set) | `bool` | `false` | no |
 | log\_collection\_services | A list of services to collect logs from. Valid values are s3/elb/elbv2/cloudfront/redshift/lambda. | `list(string)` | `null` | no |
+| log\_forwarder\_cloudformation\_sns\_topic | SNS topic ARN to receive stack events from the datadog forwarder cloudformation stack | `list(string)` | `null` | no |
 | log\_forwarder\_name | AWS log forwarder lambda name | `string` | `"datadog-forwarder"` | no |
 | log\_forwarder\_reserved\_concurrency | AWS log forwarder reserved concurrency | `number` | `null` | no |
 | log\_forwarder\_version | AWS log forwarder version to install | `string` | `"latest"` | no |

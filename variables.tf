@@ -28,6 +28,12 @@ variable "log_collection_services" {
   description = "A list of services to collect logs from. Valid values are s3/elb/elbv2/cloudfront/redshift/lambda."
 }
 
+variable "log_forwarder_cloudformation_sns_topic" {
+  type        = list(string)
+  default     = null
+  description = "SNS topic ARN to receive stack events from the datadog forwarder cloudformation stack"
+}
+
 variable "log_forwarder_name" {
   type        = string
   default     = "datadog-forwarder"
