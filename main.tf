@@ -35,6 +35,8 @@ data "aws_iam_policy_document" "datadog_integration_assume_role" {
 }
 
 data "aws_iam_policy_document" "datadog_integration_policy" {
+  #checkov:skip=CKV_AWS_111: Resource wildcard cannot be scoped because it's not known beforehand which exact resources datadog need to be able to scrape
+  #checkov:skip=CKV_AWS_109: Policy cannot be more scoped down, this is the recommended policy by datadog
   statement {
     actions = [
       "apigateway:GET",
@@ -142,7 +144,7 @@ resource "aws_cloudformation_stack" "datadog_forwarder" {
 
   parameters = {
     DdApiKey            = "this_value_is_not_used"
-    DdApiKeySecretArn   = aws_secretsmanager_secret.api_key.0.arn
+    DdApiKeySecretArn   = aws_secretsmanager_secret.api_key.0.arn #checkov:skip=CKV_SECRET_6: this is the only way to pass this value
     DdSite              = var.site_url
     DdTags              = join(",", var.datadog_tags)
     FunctionName        = var.log_forwarder_name
