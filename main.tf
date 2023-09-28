@@ -2,10 +2,15 @@ locals {
   datadog_integration_role_name = "DatadogAWSIntegrationRole"
   datadog_aws_account_id        = "464622532012"
 
-  install_log_forwarder = var.api_key != null && var.install_log_forwarder ? 1 : 0
+  install_log_forwarder  = var.api_key != null && var.install_log_forwarder ? 1 : 0
+  datadog_forwarder_yaml = data.http.datadog_forwarder_yaml_url.response_body
 }
 
 data "aws_caller_identity" "current" {}
+
+data "http" "datadog_forwarder_yaml_url" {
+  url = "https://datadog-cloudformation-template.s3.amazonaws.com/aws/forwarder/${var.log_forwarder_version}.yaml"
+}
 
 resource "datadog_integration_aws" "default" {
   account_id       = data.aws_caller_identity.current.account_id
@@ -141,7 +146,7 @@ resource "aws_cloudformation_stack" "datadog_forwarder" {
   capabilities      = ["CAPABILITY_IAM", "CAPABILITY_NAMED_IAM", "CAPABILITY_AUTO_EXPAND"]
   notification_arns = var.log_forwarder_cloudformation_sns_topic
   on_failure        = "ROLLBACK"
-  template_url      = "https://datadog-cloudformation-template.s3.amazonaws.com/aws/forwarder/${var.log_forwarder_version}.yaml"
+  template_body     = data.http.datadog_forwarder_yaml_url.response_body
   tags              = var.tags
 
   parameters = {
