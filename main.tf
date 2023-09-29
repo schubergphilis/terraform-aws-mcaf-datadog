@@ -1,9 +1,9 @@
 locals {
-  datadog_integration_role_name = "DatadogAWSIntegrationRole"
   datadog_aws_account_id        = "464622532012"
+  datadog_forwarder_yaml        = data.http.datadog_forwarder_yaml_url.response_body
+  datadog_integration_role_name = "DatadogAWSIntegrationRole"
 
-  install_log_forwarder  = var.api_key != null && var.install_log_forwarder ? 1 : 0
-  datadog_forwarder_yaml = data.http.datadog_forwarder_yaml_url.response_body
+  install_log_forwarder = var.api_key != null && var.install_log_forwarder ? 1 : 0
 }
 
 data "aws_caller_identity" "current" {}
