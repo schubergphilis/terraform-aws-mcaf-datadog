@@ -13,6 +13,7 @@
 |------|---------|
 | aws | n/a |
 | datadog | n/a |
+| http | n/a |
 
 ## Inputs
 
