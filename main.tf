@@ -136,22 +136,23 @@ resource "aws_secretsmanager_secret" "api_key" {
 
 resource "aws_secretsmanager_secret_version" "api_key" {
   count         = local.install_log_forwarder
-  secret_id     = aws_secretsmanager_secret.api_key.0.id
+  secret_id     = aws_secretsmanager_secret.api_key[0].id
   secret_string = var.api_key
 }
 
 resource "aws_cloudformation_stack" "datadog_forwarder" {
+  #checkov:skip=CKV_AWS_124: Out of our control
   count             = local.install_log_forwarder
   name              = var.log_forwarder_name
   capabilities      = ["CAPABILITY_IAM", "CAPABILITY_NAMED_IAM", "CAPABILITY_AUTO_EXPAND"]
   notification_arns = var.log_forwarder_cloudformation_sns_topic
   on_failure        = "ROLLBACK"
-  template_body     = data.http.datadog_forwarder_yaml_url.response_body
+  template_body     = local.datadog_forwarder_yaml
   tags              = var.tags
 
   parameters = {
     DdApiKey            = "this_value_is_not_used"
-    DdApiKeySecretArn   = aws_secretsmanager_secret.api_key.0.arn #checkov:skip=CKV_SECRET_6: this is the only way to pass this value
+    DdApiKeySecretArn   = aws_secretsmanager_secret.api_key[0].arn #checkov:skip=CKV_SECRET_6: this is the only way to pass this value
     DdSite              = var.site_url
     DdTags              = join(",", var.datadog_tags)
     FunctionName        = var.log_forwarder_name
@@ -172,11 +173,13 @@ resource "aws_cloudformation_stack" "datadog_forwarder" {
 resource "datadog_integration_aws_lambda_arn" "default" {
   count      = local.install_log_forwarder
   account_id = data.aws_caller_identity.current.account_id
-  lambda_arn = aws_cloudformation_stack.datadog_forwarder.0.outputs["DatadogForwarderArn"]
+  lambda_arn = aws_cloudformation_stack.datadog_forwarder[0].outputs["DatadogForwarderArn"]
 }
 
 resource "datadog_integration_aws_log_collection" "default" {
   count      = var.log_collection_services != null ? 1 : 0
   account_id = data.aws_caller_identity.current.account_id
   services   = var.log_collection_services
+
+  depends_on = [aws_cloudformation_stack.datadog_forwarder]
 }
