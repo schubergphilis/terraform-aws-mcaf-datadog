@@ -5,7 +5,6 @@ provider "aws" {
 provider "datadog" {}
 
 module "datadog" {
-  #checkov:skip=CKV_TF_1: Irrelevant for this example
   source = "../../"
 
   install_log_forwarder = true
