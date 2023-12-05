@@ -143,7 +143,7 @@ resource "aws_secretsmanager_secret_version" "api_key" {
 }
 
 resource "aws_cloudformation_stack" "datadog_forwarder" {
-  #checkov:skip=CKV_AWS_124: Out of our control
+  #checkov:skip=CKV_AWS_124: Not preferred since this resource is managed via Terraform
   count             = local.install_log_forwarder
   name              = var.log_forwarder_name
   capabilities      = ["CAPABILITY_IAM", "CAPABILITY_NAMED_IAM", "CAPABILITY_AUTO_EXPAND"]
