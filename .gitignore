@@ -23,3 +23,4 @@ override.tf.json
 
 # CheckOv pre-commit external modules path
 **/.external_modules/*
+.terraform.lock.hcl
