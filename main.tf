@@ -41,6 +41,7 @@ data "aws_iam_policy_document" "datadog_integration_assume_role" {
 
 data "aws_iam_policy_document" "datadog_integration_policy" {
   #checkov:skip=CKV_AWS_111: Resource wildcard cannot be scoped because it's not known beforehand which exact resources datadog need to be able to scrape
+  #checkov:skip=CKV_AWS_356: Policy cannot be more scoped down, this is the recommended policy by datadog
   #checkov:skip=CKV_AWS_109: Policy cannot be more scoped down, this is the recommended policy by datadog
   statement {
     actions = [
@@ -129,6 +130,7 @@ module "datadog_integration_role" {
 
 resource "aws_secretsmanager_secret" "api_key" {
   #checkov:skip=CKV_AWS_149: The cloudformation template provided by datadog does not support KMS CMK
+  #checkov:skip=CKV2_AWS_57: Autorotate is not possible for this secret
   count       = local.install_log_forwarder
   name        = replace("${var.log_forwarder_name}_api_key", "-", "_")
   description = "Datadog API key used by ${var.log_forwarder_name} lambda"
