@@ -4,6 +4,11 @@ locals {
   datadog_integration_role_name = "DatadogAWSIntegrationRole"
 
   install_log_forwarder = var.api_key != null && var.install_log_forwarder ? 1 : 0
+
+  enabled_namespaces = length(var.namespace_rules) == 0 ? null : {
+    for index, namespace in toset(data.datadog_integration_aws_namespace_rules.rules.namespace_rules) :
+    namespace => contains(var.namespace_rules, namespace)
+  }
 }
 
 data "aws_caller_identity" "current" {}
@@ -12,11 +17,14 @@ data "http" "datadog_forwarder_yaml_url" {
   url = "https://datadog-cloudformation-template.s3.amazonaws.com/aws/forwarder/${var.log_forwarder_version}.yaml"
 }
 
+data "datadog_integration_aws_namespace_rules" "rules" {}
+
 resource "datadog_integration_aws" "default" {
-  account_id       = data.aws_caller_identity.current.account_id
-  role_name        = local.datadog_integration_role_name
-  host_tags        = var.datadog_tags
-  excluded_regions = var.excluded_regions
+  account_id                       = data.aws_caller_identity.current.account_id
+  account_specific_namespace_rules = local.enabled_namespaces
+  role_name                        = local.datadog_integration_role_name
+  host_tags                        = var.datadog_tags
+  excluded_regions                 = var.excluded_regions
 }
 
 data "aws_iam_policy_document" "datadog_integration_assume_role" {
