@@ -52,6 +52,12 @@ variable "log_forwarder_version" {
   description = "AWS log forwarder version to install"
 }
 
+variable "namespace_rules" {
+  type        = list(string)
+  default     = []
+  description = "Explicit list of namespaces to enable for metrics collection. If not specific, default namespaces are enabled"
+}
+
 variable "site_url" {
   type        = string
   default     = "datadoghq.eu"
