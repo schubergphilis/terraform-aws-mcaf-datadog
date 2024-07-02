@@ -9,9 +9,12 @@ locals {
     for index, namespace in toset(data.datadog_integration_aws_namespace_rules.rules.namespace_rules) :
     namespace => contains(var.namespace_rules, namespace)
   }
+
+  security_audit_arn = format("arn:%s:iam::aws:policy/SecurityAudit", data.aws_partition.current.partition)
 }
 
 data "aws_caller_identity" "current" {}
+data "aws_partition" "current" {}
 
 data "http" "datadog_forwarder_yaml_url" {
   url = "https://datadog-cloudformation-template.s3.amazonaws.com/aws/forwarder/${var.log_forwarder_version}.yaml"
@@ -20,11 +23,13 @@ data "http" "datadog_forwarder_yaml_url" {
 data "datadog_integration_aws_namespace_rules" "rules" {}
 
 resource "datadog_integration_aws" "default" {
-  account_id                       = data.aws_caller_identity.current.account_id
-  account_specific_namespace_rules = local.enabled_namespaces
-  role_name                        = local.datadog_integration_role_name
-  host_tags                        = var.datadog_tags
-  excluded_regions                 = var.excluded_regions
+  account_id                           = data.aws_caller_identity.current.account_id
+  account_specific_namespace_rules     = local.enabled_namespaces
+  cspm_resource_collection_enabled     = var.cspm_resource_collection_enabled
+  excluded_regions                     = var.excluded_regions
+  extended_resource_collection_enabled = var.extended_resource_collection_enabled
+  host_tags                            = var.datadog_tags
+  role_name                            = local.datadog_integration_role_name
 }
 
 data "aws_iam_policy_document" "datadog_integration_assume_role" {
@@ -129,9 +134,10 @@ data "aws_iam_policy_document" "datadog_integration_policy" {
 module "datadog_integration_role" {
   source        = "github.com/schubergphilis/terraform-aws-mcaf-role?ref=v0.3.2"
   name          = local.datadog_integration_role_name
-  create_policy = true
-  postfix       = false
   assume_policy = data.aws_iam_policy_document.datadog_integration_assume_role.json
+  create_policy = true
+  policy_arns   = (var.cspm_resource_collection_enabled != null ? var.cspm_resource_collection_enabled : false) ? [local.security_audit_arn] : []
+  postfix       = false
   role_policy   = data.aws_iam_policy_document.datadog_integration_policy.json
   tags          = var.tags
 }

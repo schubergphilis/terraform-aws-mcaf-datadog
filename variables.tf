@@ -4,6 +4,12 @@ variable "api_key" {
   description = "Datadog API key"
 }
 
+variable "cspm_resource_collection_enabled" {
+  type        = bool
+  default     = null
+  description = "Whether Datadog collects cloud security posture management resources from your AWS account."
+}
+
 variable "datadog_tags" {
   type        = list(string)
   default     = []
@@ -67,4 +73,10 @@ variable "site_url" {
 variable "tags" {
   type        = map(string)
   description = "A mapping of tags to assign to the bucket"
+}
+
+variable "extended_resource_collection_enabled" {
+  type        = bool
+  default     = null
+  description = "Whether Datadog collects additional attributes and configuration information about the resources in your AWS account"
 }
