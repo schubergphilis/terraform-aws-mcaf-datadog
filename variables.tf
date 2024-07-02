@@ -6,7 +6,7 @@ variable "api_key" {
 
 variable "cspm_resource_collection_enabled" {
   type        = bool
-  default     = null
+  default     = false
   description = "Whether Datadog collects cloud security posture management resources from your AWS account."
 }
 
@@ -77,6 +77,6 @@ variable "tags" {
 
 variable "extended_resource_collection_enabled" {
   type        = bool
-  default     = null
+  default     = false
   description = "Whether Datadog collects additional attributes and configuration information about the resources in your AWS account"
 }
