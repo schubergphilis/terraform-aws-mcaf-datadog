@@ -37,7 +37,6 @@
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_iam_policy_document.datadog_integration_assume_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.datadog_integration_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
-| [aws_partition.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/partition) | data source |
 | [datadog_integration_aws_namespace_rules.rules](https://registry.terraform.io/providers/datadog/datadog/latest/docs/data-sources/integration_aws_namespace_rules) | data source |
 | [http_http.datadog_forwarder_yaml_url](https://registry.terraform.io/providers/hashicorp/http/latest/docs/data-sources/http) | data source |
 
@@ -47,10 +46,10 @@
 |------|-------------|------|---------|:--------:|
 | <a name="input_tags"></a> [tags](#input\_tags) | A mapping of tags to assign to the bucket | `map(string)` | n/a | yes |
 | <a name="input_api_key"></a> [api\_key](#input\_api\_key) | Datadog API key | `string` | `null` | no |
-| <a name="input_cspm_resource_collection_enabled"></a> [cspm\_resource\_collection\_enabled](#input\_cspm\_resource\_collection\_enabled) | Whether Datadog collects cloud security posture management resources from your AWS account. | `bool` | `null` | no |
+| <a name="input_cspm_resource_collection_enabled"></a> [cspm\_resource\_collection\_enabled](#input\_cspm\_resource\_collection\_enabled) | Whether Datadog collects cloud security posture management resources from your AWS account. | `bool` | `false` | no |
 | <a name="input_datadog_tags"></a> [datadog\_tags](#input\_datadog\_tags) | Array of tags (in the form key:value) to add to all hosts and metrics | `list(string)` | `[]` | no |
 | <a name="input_excluded_regions"></a> [excluded\_regions](#input\_excluded\_regions) | List of regions to be excluded from metrics collection in Datadog integration | `list(string)` | `[]` | no |
-| <a name="input_extended_resource_collection_enabled"></a> [extended\_resource\_collection\_enabled](#input\_extended\_resource\_collection\_enabled) | Whether Datadog collects additional attributes and configuration information about the resources in your AWS account | `bool` | `null` | no |
+| <a name="input_extended_resource_collection_enabled"></a> [extended\_resource\_collection\_enabled](#input\_extended\_resource\_collection\_enabled) | Whether Datadog collects additional attributes and configuration information about the resources in your AWS account | `bool` | `false` | no |
 | <a name="input_install_log_forwarder"></a> [install\_log\_forwarder](#input\_install\_log\_forwarder) | Set to true to install the Datadog Log Forwarder (requires var.api\_key to be set) | `bool` | `false` | no |
 | <a name="input_log_collection_services"></a> [log\_collection\_services](#input\_log\_collection\_services) | A list of services to collect logs from. Valid values are s3/elb/elbv2/cloudfront/redshift/lambda. | `list(string)` | `null` | no |
 | <a name="input_log_forwarder_cloudformation_sns_topic"></a> [log\_forwarder\_cloudformation\_sns\_topic](#input\_log\_forwarder\_cloudformation\_sns\_topic) | SNS topic ARN to receive stack events from the datadog forwarder cloudformation stack | `list(string)` | `null` | no |
