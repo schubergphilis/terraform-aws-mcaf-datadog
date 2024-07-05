@@ -133,7 +133,7 @@ module "datadog_integration_role" {
   name          = local.datadog_integration_role_name
   assume_policy = data.aws_iam_policy_document.datadog_integration_assume_role.json
   create_policy = true
-  policy_arns   = var.cspm_resource_collection_enabled ? ["arn:aws:iam:::policy/SecurityAudit"] : []
+  policy_arns   = var.cspm_resource_collection_enabled ? ["arn:aws:iam::aws:policy/SecurityAudit"] : []
   postfix       = false
   role_policy   = data.aws_iam_policy_document.datadog_integration_policy.json
   tags          = var.tags
