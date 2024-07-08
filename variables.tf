@@ -58,6 +58,17 @@ variable "log_forwarder_version" {
   description = "AWS log forwarder version to install"
 }
 
+variable "metric_tag_filters" {
+  type        = map(string)
+  default     = {}
+  description = "A list of namespaces and a tag filter query to filter metric collection of resources"
+
+  validation {
+    condition     = alltrue([for namespace in keys(var.metric_tag_filters) : contains(["elb", "application_elb", "sqs", "rds", "custom", "network_elb", "lambda"], namespace)])
+    error_message = "Allowed values for namespace are \"elb\", \"application_elb\", \"sqs\", \"rds\", \"custom\", \"network_elb\" or \"lambda\"."
+  }
+}
+
 variable "namespace_rules" {
   type        = list(string)
   default     = []
