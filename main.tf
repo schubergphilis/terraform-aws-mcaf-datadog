@@ -29,6 +29,14 @@ resource "datadog_integration_aws" "default" {
   role_name                            = local.datadog_integration_role_name
 }
 
+resource "datadog_integration_aws_tag_filter" "default" {
+  for_each = var.metric_tag_filters
+
+  account_id     = data.aws_caller_identity.current.account_id
+  namespace      = each.key
+  tag_filter_str = each.value
+}
+
 data "aws_iam_policy_document" "datadog_integration_assume_role" {
   statement {
     actions = ["sts:AssumeRole"]
