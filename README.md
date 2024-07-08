@@ -34,6 +34,7 @@
 | [datadog_integration_aws.default](https://registry.terraform.io/providers/datadog/datadog/latest/docs/resources/integration_aws) | resource |
 | [datadog_integration_aws_lambda_arn.default](https://registry.terraform.io/providers/datadog/datadog/latest/docs/resources/integration_aws_lambda_arn) | resource |
 | [datadog_integration_aws_log_collection.default](https://registry.terraform.io/providers/datadog/datadog/latest/docs/resources/integration_aws_log_collection) | resource |
+| [datadog_integration_aws_tag_filter.default](https://registry.terraform.io/providers/datadog/datadog/latest/docs/resources/integration_aws_tag_filter) | resource |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_iam_policy_document.datadog_integration_assume_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.datadog_integration_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
@@ -56,6 +57,7 @@
 | <a name="input_log_forwarder_name"></a> [log\_forwarder\_name](#input\_log\_forwarder\_name) | AWS log forwarder lambda name | `string` | `"datadog-forwarder"` | no |
 | <a name="input_log_forwarder_reserved_concurrency"></a> [log\_forwarder\_reserved\_concurrency](#input\_log\_forwarder\_reserved\_concurrency) | AWS log forwarder reserved concurrency | `number` | `null` | no |
 | <a name="input_log_forwarder_version"></a> [log\_forwarder\_version](#input\_log\_forwarder\_version) | AWS log forwarder version to install | `string` | `"latest"` | no |
+| <a name="input_metric_tag_filters"></a> [metric\_tag\_filters](#input\_metric\_tag\_filters) | A list of namespaces and a tag filter query to filter metric collection of resources | `map(string)` | `{}` | no |
 | <a name="input_namespace_rules"></a> [namespace\_rules](#input\_namespace\_rules) | Explicit list of namespaces to enable for metrics collection. If not specific, default namespaces are enabled | `list(string)` | `[]` | no |
 | <a name="input_site_url"></a> [site\_url](#input\_site\_url) | Define your Datadog Site to send data to. For the Datadog US site, set to datadoghq.com | `string` | `"datadoghq.eu"` | no |
 
