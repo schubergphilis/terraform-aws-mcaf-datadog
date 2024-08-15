@@ -26,7 +26,7 @@ resource "datadog_integration_aws" "default" {
   excluded_regions                     = var.excluded_regions
   extended_resource_collection_enabled = var.cspm_resource_collection_enabled ? true : var.extended_resource_collection_enabled
   host_tags                            = var.datadog_tags
-  role_name                            = module.datadog_integration_role.name
+  role_name                            = local.datadog_integration_role_name
 }
 
 resource "datadog_integration_aws_tag_filter" "default" {
