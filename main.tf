@@ -26,13 +26,13 @@ resource "datadog_integration_aws" "default" {
   excluded_regions                     = var.excluded_regions
   extended_resource_collection_enabled = var.cspm_resource_collection_enabled ? true : var.extended_resource_collection_enabled
   host_tags                            = var.datadog_tags
-  role_name                            = local.datadog_integration_role_name
+  role_name                            = module.datadog_integration_role.name
 }
 
 resource "datadog_integration_aws_tag_filter" "default" {
   for_each = var.metric_tag_filters
 
-  account_id     = data.aws_caller_identity.current.account_id
+  account_id     = datadog_integration_aws.default.account_id
   namespace      = each.key
   tag_filter_str = each.value
 }
