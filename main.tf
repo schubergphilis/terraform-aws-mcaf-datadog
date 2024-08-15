@@ -137,7 +137,7 @@ data "aws_iam_policy_document" "datadog_integration_policy" {
 }
 
 module "datadog_integration_role" {
-  source        = "github.com/schubergphilis/terraform-aws-mcaf-role?ref=v0.3.2"
+  source        = "github.com/schubergphilis/terraform-aws-mcaf-role?ref=v0.4.0"
   name          = local.datadog_integration_role_name
   assume_policy = data.aws_iam_policy_document.datadog_integration_assume_role.json
   create_policy = true
