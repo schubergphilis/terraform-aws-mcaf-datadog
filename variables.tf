@@ -2,6 +2,7 @@ variable "api_key" {
   type        = string
   default     = null
   description = "Datadog API key"
+  sensitive   = true
 }
 
 variable "cspm_resource_collection_enabled" {
@@ -20,6 +21,12 @@ variable "excluded_regions" {
   type        = list(string)
   default     = []
   description = "List of regions to be excluded from metrics collection in Datadog integration"
+}
+
+variable "extended_resource_collection_enabled" {
+  type        = bool
+  default     = false
+  description = "Whether Datadog collects additional attributes and configuration information about the resources in your AWS account"
 }
 
 variable "install_log_forwarder" {
@@ -84,10 +91,4 @@ variable "site_url" {
 variable "tags" {
   type        = map(string)
   description = "A mapping of tags to assign to the bucket"
-}
-
-variable "extended_resource_collection_enabled" {
-  type        = bool
-  default     = false
-  description = "Whether Datadog collects additional attributes and configuration information about the resources in your AWS account"
 }

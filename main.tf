@@ -32,7 +32,7 @@ resource "datadog_integration_aws" "default" {
 resource "datadog_integration_aws_tag_filter" "default" {
   for_each = var.metric_tag_filters
 
-  account_id     = data.aws_caller_identity.current.account_id
+  account_id     = datadog_integration_aws.default.account_id
   namespace      = each.key
   tag_filter_str = each.value
 }
@@ -137,7 +137,9 @@ data "aws_iam_policy_document" "datadog_integration_policy" {
 }
 
 module "datadog_integration_role" {
-  source        = "github.com/schubergphilis/terraform-aws-mcaf-role?ref=v0.3.2"
+  source  = "schubergphilis/mcaf-role/aws"
+  version = "~> 0.4.0"
+
   name          = local.datadog_integration_role_name
   assume_policy = data.aws_iam_policy_document.datadog_integration_assume_role.json
   create_policy = true
