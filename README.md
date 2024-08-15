@@ -22,7 +22,7 @@
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_datadog_integration_role"></a> [datadog\_integration\_role](#module\_datadog\_integration\_role) | github.com/schubergphilis/terraform-aws-mcaf-role | v0.3.2 |
+| <a name="module_datadog_integration_role"></a> [datadog\_integration\_role](#module\_datadog\_integration\_role) | github.com/schubergphilis/terraform-aws-mcaf-role | v0.4.0 |
 
 ## Resources
 
