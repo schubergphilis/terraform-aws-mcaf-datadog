@@ -136,6 +136,41 @@ data "aws_iam_policy_document" "datadog_integration_policy" {
   }
 }
 
+data "aws_iam_policy_document" "datadog_resource_collection_policy" {
+  #https://docs.datadoghq.com/integrations/amazon_web_services/#aws-resource-collection-iam-policy
+  #checkov:skip=CKV_AWS_111: Resource wildcard cannot be scoped because it's not known beforehand which exact resources datadog need to be able to scrape
+  statement {
+    actions = [
+      "backup:ListRecoveryPointsByBackupVault",
+      "cassandra:Select",
+      "ec2:GetSnapshotBlockPublicAccessState",
+      "glacier:GetVaultNotifications",
+      "glue:ListRegistries",
+      "lightsail:GetInstancePortStates",
+      "savingsplans:DescribeSavingsPlanRates",
+      "savingsplans:DescribeSavingsPlans",
+      "timestream:DescribeEndpoints",
+      "waf-regional:ListRuleGroups",
+      "waf-regional:ListRules",
+      "waf:ListRuleGroups",
+      "waf:ListRules",
+      "wafv2:GetIPSet",
+      "wafv2:GetRegexPatternSet",
+      "wafv2:GetRuleGroup",
+    ]
+
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "datadog_resource_collection_policy" {
+  count = var.cspm_resource_collection_enabled ? 1 : 0
+
+  name        = "DatadogResourceCollectionPolicy"
+  description = "Datadog policy to collect additional attributes and configuration information about the resources in your AWS account"
+  policy      = data.aws_iam_policy_document.datadog_resource_collection_policy.json
+}
+
 module "datadog_integration_role" {
   source  = "schubergphilis/mcaf-role/aws"
   version = "~> 0.4.0"
@@ -143,7 +178,7 @@ module "datadog_integration_role" {
   name          = local.datadog_integration_role_name
   assume_policy = data.aws_iam_policy_document.datadog_integration_assume_role.json
   create_policy = true
-  policy_arns   = var.cspm_resource_collection_enabled ? ["arn:aws:iam::aws:policy/SecurityAudit"] : []
+  policy_arns   = var.cspm_resource_collection_enabled ? ["arn:aws:iam::aws:policy/SecurityAudit", aws_iam_policy.datadog_resource_collection_policy[0].arn] : []
   postfix       = false
   role_policy   = data.aws_iam_policy_document.datadog_integration_policy.json
   tags          = var.tags
