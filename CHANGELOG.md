@@ -5,6 +5,16 @@ All notable changes to this project will automatically be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.8.0 - 2024-08-20
+
+### What's Changed
+
+#### 🚀 Features
+
+* feat: additional AWS resource collection IAM policy (#31) @Plork
+
+**Full Changelog**: https://github.com/schubergphilis/terraform-aws-mcaf-datadog/compare/v0.7.1...v0.8.0
+
 ## v0.7.1 - 2024-08-15
 
 ### What's Changed
