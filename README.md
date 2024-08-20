@@ -29,6 +29,7 @@
 | Name | Type |
 |------|------|
 | [aws_cloudformation_stack.datadog_forwarder](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudformation_stack) | resource |
+| [aws_iam_policy.datadog_resource_collection_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_secretsmanager_secret.api_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
 | [aws_secretsmanager_secret_version.api_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
 | [datadog_integration_aws.default](https://registry.terraform.io/providers/datadog/datadog/latest/docs/resources/integration_aws) | resource |
@@ -38,6 +39,7 @@
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_iam_policy_document.datadog_integration_assume_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.datadog_integration_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.datadog_resource_collection_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [datadog_integration_aws_namespace_rules.rules](https://registry.terraform.io/providers/datadog/datadog/latest/docs/data-sources/integration_aws_namespace_rules) | data source |
 | [http_http.datadog_forwarder_yaml_url](https://registry.terraform.io/providers/hashicorp/http/latest/docs/data-sources/http) | data source |
 
