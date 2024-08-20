@@ -1,7 +1,8 @@
 locals {
-  datadog_aws_account_id        = "464622532012"
-  datadog_forwarder_yaml        = data.http.datadog_forwarder_yaml_url.response_body
-  datadog_integration_role_name = "DatadogAWSIntegrationRole"
+  datadog_aws_account_id                  = "464622532012"
+  datadog_forwarder_yaml                  = data.http.datadog_forwarder_yaml_url.response_body
+  datadog_integration_role_name           = "DatadogAWSIntegrationRole"
+  datadog_resource_collection_policy_name = "DatadogResourceCollectionPolicy"
 
   install_log_forwarder = var.api_key != null && var.install_log_forwarder ? 1 : 0
 
@@ -58,6 +59,7 @@ data "aws_iam_policy_document" "datadog_integration_assume_role" {
 }
 
 data "aws_iam_policy_document" "datadog_integration_policy" {
+  #https://docs.datadoghq.com/integrations/amazon_web_services/#aws-integration-iam-policy
   #checkov:skip=CKV_AWS_111: Resource wildcard cannot be scoped because it's not known beforehand which exact resources datadog need to be able to scrape
   #checkov:skip=CKV_AWS_356: Policy cannot be more scoped down, this is the recommended policy by datadog
   #checkov:skip=CKV_AWS_109: Policy cannot be more scoped down, this is the recommended policy by datadog
@@ -65,11 +67,13 @@ data "aws_iam_policy_document" "datadog_integration_policy" {
     actions = [
       "apigateway:GET",
       "autoscaling:Describe*",
+      "backup:List*",
       "budgets:ViewBudget",
       "cloudfront:GetDistributionConfig",
       "cloudfront:ListDistributions",
       "cloudtrail:DescribeTrails",
       "cloudtrail:GetTrailStatus",
+      "cloudtrail:LookupEvents",
       "cloudwatch:Describe*",
       "cloudwatch:Get*",
       "cloudwatch:List*",
@@ -79,6 +83,8 @@ data "aws_iam_policy_document" "datadog_integration_policy" {
       "dynamodb:Describe*",
       "dynamodb:List*",
       "ec2:Describe*",
+      "ec2:GetTransitGatewayPrefixListReferences",
+      "ec2:SearchTransitGatewayRoutes",
       "ecs:Describe*",
       "ecs:List*",
       "elasticache:Describe*",
@@ -97,10 +103,8 @@ data "aws_iam_policy_document" "datadog_integration_policy" {
       "health:DescribeEvents",
       "kinesis:Describe*",
       "kinesis:List*",
-      "lambda:AddPermission",
       "lambda:GetPolicy",
       "lambda:List*",
-      "lambda:RemovePermission",
       "logs:DeleteSubscriptionFilter",
       "logs:Describe*",
       "logs:DescribeSubscriptionFilters",
@@ -108,6 +112,8 @@ data "aws_iam_policy_document" "datadog_integration_policy" {
       "logs:Get*",
       "logs:PutSubscriptionFilter",
       "logs:TestMetricFilter",
+      "organizations:Describe*",
+      "organizations:List*",
       "rds:Describe*",
       "rds:List*",
       "redshift:DescribeClusters",
@@ -139,6 +145,7 @@ data "aws_iam_policy_document" "datadog_integration_policy" {
 data "aws_iam_policy_document" "datadog_resource_collection_policy" {
   #https://docs.datadoghq.com/integrations/amazon_web_services/#aws-resource-collection-iam-policy
   #checkov:skip=CKV_AWS_111: Resource wildcard cannot be scoped because it's not known beforehand which exact resources datadog need to be able to scrape
+  #checkov:skip=CKV_AWS_356: Policy cannot be more scoped down, this is the recommended policy by datadog
   statement {
     actions = [
       "backup:ListRecoveryPointsByBackupVault",
@@ -166,7 +173,7 @@ data "aws_iam_policy_document" "datadog_resource_collection_policy" {
 resource "aws_iam_policy" "datadog_resource_collection_policy" {
   count = var.cspm_resource_collection_enabled ? 1 : 0
 
-  name        = "DatadogResourceCollectionPolicy"
+  name        = local.datadog_resource_collection_policy_name
   description = "Datadog policy to collect additional attributes and configuration information about the resources in your AWS account"
   policy      = data.aws_iam_policy_document.datadog_resource_collection_policy.json
 }
@@ -178,7 +185,7 @@ module "datadog_integration_role" {
   name          = local.datadog_integration_role_name
   assume_policy = data.aws_iam_policy_document.datadog_integration_assume_role.json
   create_policy = true
-  policy_arns   = var.cspm_resource_collection_enabled ? ["arn:aws:iam::aws:policy/SecurityAudit", aws_iam_policy.datadog_resource_collection_policy[0].arn] : []
+  policy_arns   = var.cspm_resource_collection_enabled ? ["arn:aws:iam::aws:policy/SecurityAudit", "arn:aws:iam::aws:policy/${local.datadog_resource_collection_policy_name}"] : []
   postfix       = false
   role_policy   = data.aws_iam_policy_document.datadog_integration_policy.json
   tags          = var.tags
