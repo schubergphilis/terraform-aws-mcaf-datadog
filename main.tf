@@ -171,7 +171,7 @@ data "aws_iam_policy_document" "datadog_resource_collection_policy" {
 }
 
 resource "aws_iam_policy" "datadog_resource_collection_policy" {
-  count = var.cspm_resource_collection_enabled ? 1 : 0
+  count = var.extended_resource_collection_enabled ? 1 : 0
 
   name        = local.datadog_resource_collection_policy_name
   description = "Datadog policy to collect additional attributes and configuration information about the resources in your AWS account"
@@ -185,10 +185,12 @@ module "datadog_integration_role" {
   name          = local.datadog_integration_role_name
   assume_policy = data.aws_iam_policy_document.datadog_integration_assume_role.json
   create_policy = true
-  policy_arns   = var.cspm_resource_collection_enabled ? ["arn:aws:iam::aws:policy/SecurityAudit", "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/${local.datadog_resource_collection_policy_name}"] : []
+  policy_arns   = var.extended_resource_collection_enabled ? ["arn:aws:iam::aws:policy/SecurityAudit", "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/${local.datadog_resource_collection_policy_name}"] : []
   postfix       = false
   role_policy   = data.aws_iam_policy_document.datadog_integration_policy.json
   tags          = var.tags
+
+  depends_on = [aws_iam_policy.datadog_resource_collection_policy]
 }
 
 resource "aws_secretsmanager_secret" "api_key" {
