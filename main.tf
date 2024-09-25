@@ -3,6 +3,7 @@ locals {
   datadog_forwarder_yaml                  = data.http.datadog_forwarder_yaml_url.response_body
   datadog_integration_role_name           = "DatadogAWSIntegrationRole"
   datadog_resource_collection_policy_name = "DatadogResourceCollectionPolicy"
+  datadog_resource_collection_enabled     = var.cspm_resource_collection_enabled || var.extended_resource_collection_enabled ? true : false
 
   install_log_forwarder = var.api_key != null && var.install_log_forwarder ? 1 : 0
 
@@ -25,7 +26,7 @@ resource "datadog_integration_aws" "default" {
   account_specific_namespace_rules     = local.enabled_namespaces
   cspm_resource_collection_enabled     = var.cspm_resource_collection_enabled
   excluded_regions                     = var.excluded_regions
-  extended_resource_collection_enabled = var.cspm_resource_collection_enabled ? true : var.extended_resource_collection_enabled
+  extended_resource_collection_enabled = local.datadog_resource_collection_enabled
   host_tags                            = var.datadog_tags
   role_name                            = local.datadog_integration_role_name
 }
@@ -171,7 +172,7 @@ data "aws_iam_policy_document" "datadog_resource_collection_policy" {
 }
 
 resource "aws_iam_policy" "datadog_resource_collection_policy" {
-  count = var.extended_resource_collection_enabled ? 1 : 0
+  count = local.datadog_resource_collection_enabled ? 1 : 0
 
   name        = local.datadog_resource_collection_policy_name
   description = "Datadog policy to collect additional attributes and configuration information about the resources in your AWS account"
@@ -185,7 +186,7 @@ module "datadog_integration_role" {
   name          = local.datadog_integration_role_name
   assume_policy = data.aws_iam_policy_document.datadog_integration_assume_role.json
   create_policy = true
-  policy_arns   = var.extended_resource_collection_enabled ? ["arn:aws:iam::aws:policy/SecurityAudit", "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/${local.datadog_resource_collection_policy_name}"] : []
+  policy_arns   = local.datadog_resource_collection_enabled ? ["arn:aws:iam::aws:policy/SecurityAudit", "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/${local.datadog_resource_collection_policy_name}"] : []
   postfix       = false
   role_policy   = data.aws_iam_policy_document.datadog_integration_policy.json
   tags          = var.tags
