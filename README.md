@@ -47,7 +47,6 @@
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_tags"></a> [tags](#input\_tags) | A mapping of tags to assign to the bucket | `map(string)` | n/a | yes |
 | <a name="input_api_key"></a> [api\_key](#input\_api\_key) | Datadog API key | `string` | `null` | no |
 | <a name="input_cspm_resource_collection_enabled"></a> [cspm\_resource\_collection\_enabled](#input\_cspm\_resource\_collection\_enabled) | Whether Datadog collects cloud security posture management resources from your AWS account. | `bool` | `false` | no |
 | <a name="input_datadog_tags"></a> [datadog\_tags](#input\_datadog\_tags) | Array of tags (in the form key:value) to add to all hosts and metrics | `list(string)` | `[]` | no |
@@ -62,6 +61,7 @@
 | <a name="input_metric_tag_filters"></a> [metric\_tag\_filters](#input\_metric\_tag\_filters) | A list of namespaces and a tag filter query to filter metric collection of resources | `map(string)` | `{}` | no |
 | <a name="input_namespace_rules"></a> [namespace\_rules](#input\_namespace\_rules) | Explicit list of namespaces to enable for metrics collection. If not specific, default namespaces are enabled | `list(string)` | `[]` | no |
 | <a name="input_site_url"></a> [site\_url](#input\_site\_url) | Define your Datadog Site to send data to. For the Datadog US site, set to datadoghq.com | `string` | `"datadoghq.eu"` | no |
+| <a name="input_tags"></a> [tags](#input\_tags) | A mapping of tags to assign to the bucket | `map(string)` | `{}` | no |
 
 ## Outputs
 
