@@ -52,7 +52,7 @@ variable "install_log_forwarder" {
   description = "Set to true to install the Datadog Log Forwarder (requires var.api_key to be set)"
 
   validation {
-    condition     = var.api_key != null || var.create_api_key || !var.install_log_forwarder
+    condition     = !var.install_log_forwarder || var.create_api_key || try(length(var.api_key), 0) > 0
     error_message = "The api_key value must be set or create_api_key has to be enabled if install_log_forwarder is set to true."
   }
 }
