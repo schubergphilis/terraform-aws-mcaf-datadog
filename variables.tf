@@ -5,10 +5,27 @@ variable "api_key" {
   sensitive   = true
 }
 
+variable "api_key_name" {
+  type        = string
+  default     = null
+  description = "Name of the Datadog API key used if create_api_key is set to true, otherwise ignored"
+
+  validation {
+    condition     = !var.create_api_key || length(var.api_key_name) > 0
+    error_message = "The api_key_name value must be set if create_api_key is set to true."
+  }
+}
+
 variable "cspm_resource_collection_enabled" {
   type        = bool
   default     = false
   description = "Whether Datadog collects cloud security posture management resources from your AWS account."
+}
+
+variable "create_api_key" {
+  type        = bool
+  default     = false
+  description = "Set to true to create a Datadog API key. Warning: by default Datadog allows maximum 50 API keys per organization."
 }
 
 variable "datadog_tags" {
@@ -33,6 +50,11 @@ variable "install_log_forwarder" {
   type        = bool
   default     = false
   description = "Set to true to install the Datadog Log Forwarder (requires var.api_key to be set)"
+
+  validation {
+    condition     = var.api_key != null || var.create_api_key || !var.install_log_forwarder
+    error_message = "The api_key value must be set or create_api_key has to be enabled if install_log_forwarder is set to true."
+  }
 }
 
 variable "log_collection_services" {
