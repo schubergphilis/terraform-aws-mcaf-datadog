@@ -11,7 +11,7 @@ variable "api_key_name" {
   description = "Name of the Datadog API key used if create_api_key is set to true, otherwise ignored"
 
   validation {
-    condition     = !var.create_api_key || length(var.api_key_name) > 0
+    condition     = !var.create_api_key || try(length(var.api_key_name), 0) > 0
     error_message = "The api_key_name value must be set if create_api_key is set to true."
   }
 }
