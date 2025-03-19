@@ -5,7 +5,7 @@
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.0.0 |
 | <a name="requirement_datadog"></a> [datadog](#requirement\_datadog) | >= 3.39 |
 | <a name="requirement_http"></a> [http](#requirement\_http) | >= 3.0 |
@@ -50,7 +50,7 @@
 |------|-------------|------|---------|:--------:|
 | <a name="input_api_key"></a> [api\_key](#input\_api\_key) | Datadog API key | `string` | `null` | no |
 | <a name="input_api_key_name"></a> [api\_key\_name](#input\_api\_key\_name) | Name of the Datadog API key used if create\_api\_key is set to true, otherwise ignored | `string` | `null` | no |
-| <a name="input_create_api_key"></a> [create\_api\_key](#input\_create\_api\_key) | Set to true to create a Datadog API key. Warning: by default Datadog allows maximum 50 API keys per organization. | `bool` | `false` | no |
+| <a name="input_create_api_key"></a> [create\_api\_key](#input\_create\_api\_key) | Set to true to have this module create a Datadog API key. Warning: Datadog allows a maximum of 50 API keys per organization by default. | `bool` | `false` | no |
 | <a name="input_cspm_resource_collection_enabled"></a> [cspm\_resource\_collection\_enabled](#input\_cspm\_resource\_collection\_enabled) | Whether Datadog collects cloud security posture management resources from your AWS account. | `bool` | `false` | no |
 | <a name="input_datadog_tags"></a> [datadog\_tags](#input\_datadog\_tags) | Array of tags (in the form key:value) to add to all hosts and metrics | `list(string)` | `[]` | no |
 | <a name="input_excluded_regions"></a> [excluded\_regions](#input\_excluded\_regions) | List of regions to be excluded from metrics collection in Datadog integration | `list(string)` | `[]` | no |
