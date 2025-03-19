@@ -7,6 +7,5 @@ provider "datadog" {}
 module "datadog" {
   source = "../../"
 
-  install_log_forwarder = true
-  tags                  = { Terraform = true }
+  tags = { Terraform = true }
 }

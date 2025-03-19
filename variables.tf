@@ -25,7 +25,7 @@ variable "cspm_resource_collection_enabled" {
 variable "create_api_key" {
   type        = bool
   default     = false
-  description = "Set to true to create a Datadog API key. Warning: by default Datadog allows maximum 50 API keys per organization."
+  description = "Set to true to have this module create a Datadog API key. Warning: Datadog allows a maximum of 50 API keys per organization by default."
 }
 
 variable "datadog_tags" {

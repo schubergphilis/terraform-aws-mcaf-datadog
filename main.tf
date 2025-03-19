@@ -201,7 +201,8 @@ resource "datadog_api_key" "default" {
 resource "aws_secretsmanager_secret" "api_key" {
   #checkov:skip=CKV_AWS_149: The cloudformation template provided by datadog does not support KMS CMK
   #checkov:skip=CKV2_AWS_57: Autorotate is not possible for this secret
-  count       = var.install_log_forwarder ? 1 : 0
+  count = var.install_log_forwarder ? 1 : 0
+
   name        = replace("${var.log_forwarder_name}_api_key", "-", "_")
   description = "Datadog API key used by ${var.log_forwarder_name} lambda"
 }
@@ -214,7 +215,8 @@ resource "aws_secretsmanager_secret_version" "api_key" {
 
 resource "aws_cloudformation_stack" "datadog_forwarder" {
   #checkov:skip=CKV_AWS_124: Not preferred since this resource is managed via Terraform
-  count             = var.install_log_forwarder ? 1 : 0
+  count = var.install_log_forwarder ? 1 : 0
+
   name              = var.log_forwarder_name
   capabilities      = ["CAPABILITY_IAM", "CAPABILITY_NAMED_IAM", "CAPABILITY_AUTO_EXPAND"]
   notification_arns = var.log_forwarder_cloudformation_sns_topic
@@ -243,13 +245,15 @@ resource "aws_cloudformation_stack" "datadog_forwarder" {
 }
 
 resource "datadog_integration_aws_lambda_arn" "default" {
-  count      = var.install_log_forwarder ? 1 : 0
+  count = var.install_log_forwarder ? 1 : 0
+
   account_id = data.aws_caller_identity.current.account_id
   lambda_arn = aws_cloudformation_stack.datadog_forwarder[0].outputs["DatadogForwarderArn"]
 }
 
 resource "datadog_integration_aws_log_collection" "default" {
-  count      = var.log_collection_services != null ? 1 : 0
+  count = var.log_collection_services != null ? 1 : 0
+
   account_id = data.aws_caller_identity.current.account_id
   services   = var.log_collection_services
 
