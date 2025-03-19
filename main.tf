@@ -322,6 +322,8 @@ data "aws_iam_policy_document" "datadog_resource_collection_policy" {
       "deadline:ListMonitors",
       "deadline:ListQueues",
       "deadline:ListWorkers",
+      "identitystore:DescribeGroup",
+      "identitystore:DescribeGroupMembership",
       "imagebuilder:GetContainerRecipe",
       "imagebuilder:GetDistributionConfiguration",
       "imagebuilder:GetImageRecipe",
