@@ -7,7 +7,7 @@
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.0.0 |
-| <a name="requirement_datadog"></a> [datadog](#requirement\_datadog) | >= 3.39 |
+| <a name="requirement_datadog"></a> [datadog](#requirement\_datadog) | >= 4.0.0 |
 | <a name="requirement_http"></a> [http](#requirement\_http) | >= 3.0 |
 
 ## Providers
@@ -15,7 +15,7 @@
 | Name | Version |
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.0.0 |
-| <a name="provider_datadog"></a> [datadog](#provider\_datadog) | >= 3.39 |
+| <a name="provider_datadog"></a> [datadog](#provider\_datadog) | >= 4.0.0 |
 | <a name="provider_http"></a> [http](#provider\_http) | >= 3.0 |
 
 ## Modules
@@ -33,10 +33,10 @@
 | [aws_secretsmanager_secret.api_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
 | [aws_secretsmanager_secret_version.api_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
 | [datadog_api_key.default](https://registry.terraform.io/providers/datadog/datadog/latest/docs/resources/api_key) | resource |
-| [datadog_integration_aws.default](https://registry.terraform.io/providers/datadog/datadog/latest/docs/resources/integration_aws) | resource |
-| [datadog_integration_aws_lambda_arn.default](https://registry.terraform.io/providers/datadog/datadog/latest/docs/resources/integration_aws_lambda_arn) | resource |
-| [datadog_integration_aws_log_collection.default](https://registry.terraform.io/providers/datadog/datadog/latest/docs/resources/integration_aws_log_collection) | resource |
-| [datadog_integration_aws_tag_filter.default](https://registry.terraform.io/providers/datadog/datadog/latest/docs/resources/integration_aws_tag_filter) | resource |
+| [datadog_integration_aws_account.default](https://registry.terraform.io/providers/datadog/datadog/latest/docs/resources/integration_aws_account) | resource |
+| [datadog_integration_aws_account_lambda_arn.default](https://registry.terraform.io/providers/datadog/datadog/latest/docs/resources/integration_aws_account_lambda_arn) | resource |
+| [datadog_integration_aws_account_log_collection.default](https://registry.terraform.io/providers/datadog/datadog/latest/docs/resources/integration_aws_account_log_collection) | resource |
+| [datadog_integration_aws_account_tag_filter.default](https://registry.terraform.io/providers/datadog/datadog/latest/docs/resources/integration_aws_account_tag_filter) | resource |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_iam_policy_document.datadog_integration_assume_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.datadog_integration_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |

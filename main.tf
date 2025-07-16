@@ -19,22 +19,49 @@ data "http" "datadog_forwarder_yaml_url" {
 
 data "datadog_integration_aws_namespace_rules" "rules" {}
 
-resource "datadog_integration_aws" "default" {
-  account_id                           = data.aws_caller_identity.current.account_id
-  account_specific_namespace_rules     = local.enabled_namespaces
-  cspm_resource_collection_enabled     = var.cspm_resource_collection_enabled
-  excluded_regions                     = var.excluded_regions
-  extended_resource_collection_enabled = local.datadog_resource_collection_enabled
-  host_tags                            = var.datadog_tags
-  role_name                            = local.datadog_integration_role_name
+resource "datadog_integration_aws_account" "default" {
+  aws_account_id = data.aws_caller_identity.current.account_id
+  aws_partition  = "aws"
+  aws_regions {
+    include_all  = length(var.included_regions) == 0 ? true : null
+    include_only = length(var.included_regions) > 0 ? var.included_regions : null
+  }
+  account_tags = var.datadog_tags
+
+  auth_config {
+    aws_auth_config_role {
+      role_name = local.datadog_integration_role_name
+    }
+  }
+  metrics_config {
+    namespace_filters {
+      exclude_only = local.enabled_namespaces
+    }
+  }
+  resources_config {
+    cloud_security_posture_management_collection = var.cspm_resource_collection_enabled
+    extended_collection                          = local.datadog_resource_collection_enabled
+  }
 }
 
-resource "datadog_integration_aws_tag_filter" "default" {
+# State migration block for users upgrading from deprecated resource
+moved {
+  from = datadog_integration_aws.default
+  to   = datadog_integration_aws_account.default
+}
+
+resource "datadog_integration_aws_account_tag_filter" "default" {
   for_each = var.metric_tag_filters
 
-  account_id     = datadog_integration_aws.default.account_id
+  account_id     = datadog_integration_aws_account.default.account_id
   namespace      = each.key
   tag_filter_str = each.value
+}
+
+# State migration block for users upgrading from deprecated resource
+moved {
+  from = datadog_integration_aws_tag_filter.default
+  to   = datadog_integration_aws_account_tag_filter.default
 }
 
 data "aws_iam_policy_document" "datadog_integration_assume_role" {
@@ -51,7 +78,7 @@ data "aws_iam_policy_document" "datadog_integration_assume_role" {
       variable = "sts:ExternalId"
 
       values = [
-        datadog_integration_aws.default.external_id
+        datadog_integration_aws_account.default.external_id
       ]
     }
   }
@@ -436,21 +463,33 @@ resource "aws_cloudformation_stack" "datadog_forwarder" {
     ]
   }
 
-  depends_on = [datadog_integration_aws.default]
+  depends_on = [datadog_integration_aws_account.default]
 }
 
-resource "datadog_integration_aws_lambda_arn" "default" {
+resource "datadog_integration_aws_account_lambda_arn" "default" {
   count = var.install_log_forwarder ? 1 : 0
 
   account_id = data.aws_caller_identity.current.account_id
   lambda_arn = aws_cloudformation_stack.datadog_forwarder[0].outputs["DatadogForwarderArn"]
 }
 
-resource "datadog_integration_aws_log_collection" "default" {
+# State migration block for users upgrading from deprecated resource
+moved {
+  from = datadog_integration_aws_lambda_arn.default
+  to   = datadog_integration_aws_account_lambda_arn.default
+}
+
+resource "datadog_integration_aws_account_log_collection" "default" {
   count = var.log_collection_services != null ? 1 : 0
 
   account_id = data.aws_caller_identity.current.account_id
   services   = var.log_collection_services
 
   depends_on = [aws_cloudformation_stack.datadog_forwarder]
+}
+
+# State migration block for users upgrading from deprecated resource
+moved {
+  from = datadog_integration_aws_log_collection.default
+  to   = datadog_integration_aws_account_log_collection.default
 }

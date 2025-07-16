@@ -46,16 +46,22 @@ variable "datadog_tags" {
   description = "Array of tags (in the form key:value) to add to all hosts and metrics"
 }
 
-variable "excluded_regions" {
-  type        = list(string)
-  default     = []
-  description = "List of regions to be excluded from metrics collection in Datadog integration"
-}
-
 variable "extended_resource_collection_enabled" {
   type        = bool
   default     = false
   description = "Whether Datadog collects additional attributes and configuration information about the resources in your AWS account"
+}
+
+variable "included_regions" {
+  type        = list(string)
+  default     = []
+  description = <<-EOT
+    List of regions to be included in metrics collection for Datadog integration.
+    When empty (default), all regions are included (include_all behavior).
+
+    Example to include only specific regions:
+    included_regions = ["us-east-1", "us-west-2", "eu-west-1"]
+  EOT
 }
 
 variable "install_log_forwarder" {
