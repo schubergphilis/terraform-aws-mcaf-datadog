@@ -94,7 +94,7 @@ variable "metric_tag_filters" {
 
 variable "namespace_filters" {
   type = object({
-    exclude_only = optional(list(string), ["AWS/SQS", "AWS/ElasticMapReduce", "AWS/Usage"])
+    exclude_only = optional(list(string), null)
     include_only = optional(list(string), null)
   })
   default = {
