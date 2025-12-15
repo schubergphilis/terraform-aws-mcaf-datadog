@@ -27,7 +27,7 @@ resource "datadog_integration_aws_account" "default" {
 
   logs_config {
     lambda_forwarder {
-      lambdas = var.install_log_forwarder ? [module.datadog_forwarder.output.datadog_forwarder_arn] : null
+      lambdas = var.install_log_forwarder ? [module.datadog_forwarder[0].datadog_forwarder_arn] : null
       sources = var.log_collection_services
     }
   }
