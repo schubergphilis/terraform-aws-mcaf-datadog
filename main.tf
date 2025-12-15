@@ -15,7 +15,7 @@ resource "datadog_integration_aws_account" "default" {
   aws_partition  = data.aws_partition.current.partition
 
   aws_regions {
-    include_all  = length(var.included_regions) == 0
+    include_all  = length(var.included_regions) == 0 ? true : null
     include_only = length(var.included_regions) == 0 ? null : var.included_regions
   }
 
