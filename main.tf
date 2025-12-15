@@ -1,41 +1,62 @@
 locals {
   datadog_aws_account_id                  = "464622532012"
-  datadog_forwarder_yaml                  = data.http.datadog_forwarder_yaml_url.response_body
   datadog_integration_role_name           = "DatadogAWSIntegrationRole"
   datadog_resource_collection_policy_name = "DatadogResourceCollectionPolicy"
   datadog_resource_collection_enabled     = var.cspm_resource_collection_enabled || var.extended_resource_collection_enabled ? true : false
-
-  enabled_namespaces = length(var.namespace_rules) == 0 ? null : {
-    for index, namespace in toset(data.datadog_integration_aws_namespace_rules.rules.namespace_rules) :
-    namespace => contains(var.namespace_rules, namespace)
-  }
 }
 
 data "aws_caller_identity" "current" {}
 
-data "http" "datadog_forwarder_yaml_url" {
-  url = "https://datadog-cloudformation-template.s3.amazonaws.com/aws/forwarder/${var.log_forwarder_version}.yaml"
+data "aws_partition" "current" {}
+
+resource "datadog_integration_aws_account" "default" {
+  account_tags   = var.datadog_tags
+  aws_account_id = data.aws_caller_identity.current.account_id
+  aws_partition  = data.aws_partition.current.partition
+
+  aws_regions {
+    include_all  = length(var.included_regions) == 0
+    include_only = length(var.included_regions) == 0 ? null : var.included_regions
+  }
+
+  auth_config {
+    aws_auth_config_role {
+      role_name = local.datadog_integration_role_name
+    }
+  }
+
+  logs_config {
+    lambda_forwarder {
+      lambdas = var.install_log_forwarder ? [module.datadog_forwarder.datadog_forwarder_arn] : null
+      sources = var.log_collection_services
+    }
+  }
+
+  metrics_config {
+    namespace_filters {
+      exclude_only = var.namespace_filters.exclude_only
+      include_only = var.namespace_filters.include_only
+    }
+    dynamic "tag_filters" {
+      for_each = var.metric_tag_filters
+      content {
+        namespace = each.key
+        tags      = each.value
+      }
+    }
+  }
+
+  resources_config {
+    cloud_security_posture_management_collection = var.cspm_resource_collection_enabled
+    extended_collection                          = local.datadog_resource_collection_enabled
+  }
+
+  traces_config {
+    xray_services {}
+  }
 }
 
-data "datadog_integration_aws_namespace_rules" "rules" {}
 
-resource "datadog_integration_aws" "default" {
-  account_id                           = data.aws_caller_identity.current.account_id
-  account_specific_namespace_rules     = local.enabled_namespaces
-  cspm_resource_collection_enabled     = var.cspm_resource_collection_enabled
-  excluded_regions                     = var.excluded_regions
-  extended_resource_collection_enabled = local.datadog_resource_collection_enabled
-  host_tags                            = var.datadog_tags
-  role_name                            = local.datadog_integration_role_name
-}
-
-resource "datadog_integration_aws_tag_filter" "default" {
-  for_each = var.metric_tag_filters
-
-  account_id     = datadog_integration_aws.default.account_id
-  namespace      = each.key
-  tag_filter_str = each.value
-}
 
 data "aws_iam_policy_document" "datadog_integration_assume_role" {
   statement {
@@ -51,7 +72,7 @@ data "aws_iam_policy_document" "datadog_integration_assume_role" {
       variable = "sts:ExternalId"
 
       values = [
-        datadog_integration_aws.default.external_id
+        datadog_integration_aws_account.default.auth_config.aws_auth_config_role.external_id
       ]
     }
   }
@@ -373,12 +394,12 @@ resource "aws_iam_policy" "datadog_resource_collection_policy" {
 
 module "datadog_integration_role" {
   source  = "schubergphilis/mcaf-role/aws"
-  version = "~> 0.4.0"
+  version = "~> 0.5.3"
 
   name          = local.datadog_integration_role_name
   assume_policy = data.aws_iam_policy_document.datadog_integration_assume_role.json
   create_policy = true
-  policy_arns   = local.datadog_resource_collection_enabled ? ["arn:aws:iam::aws:policy/SecurityAudit", "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/${local.datadog_resource_collection_policy_name}"] : []
+  policy_arns   = local.datadog_resource_collection_enabled ? ["arn:aws:iam::aws:policy/SecurityAudit", aws_iam_policy.datadog_resource_collection_policy[0].arn] : []
   postfix       = false
   role_policy   = data.aws_iam_policy_document.datadog_integration_policy.json
   tags          = var.tags
@@ -407,49 +428,16 @@ resource "aws_secretsmanager_secret_version" "api_key" {
   secret_string = var.create_api_key ? datadog_api_key.default[0].key : var.api_key
 }
 
-resource "aws_cloudformation_stack" "datadog_forwarder" {
-  #checkov:skip=CKV_AWS_124: Not preferred since this resource is managed via Terraform
+module "datadog_forwarder" {
   count = var.install_log_forwarder ? 1 : 0
 
-  name              = var.log_forwarder_name
-  capabilities      = ["CAPABILITY_IAM", "CAPABILITY_NAMED_IAM", "CAPABILITY_AUTO_EXPAND"]
-  notification_arns = var.log_forwarder_cloudformation_sns_topic
-  on_failure        = "ROLLBACK"
-  template_body     = local.datadog_forwarder_yaml
-  tags              = var.tags
+  source  = "DataDog/log-lambda-forwarder-datadog/aws"
+  version = "~> 1.0"
 
-  parameters = {
-    DdApiKey            = "this_value_is_not_used"
-    DdApiKeySecretArn   = aws_secretsmanager_secret.api_key[0].arn #checkov:skip=CKV_SECRET_6: this is the only way to pass this value
-    DdSite              = var.site_url
-    DdTags              = join(",", var.datadog_tags)
-    FunctionName        = var.log_forwarder_name
-    ReservedConcurrency = var.log_forwarder_reserved_concurrency
-  }
-
-  // The DdApiKey parameter has the NoEcho tag set in the cfn template, causing
-  // Terraform to reset the value, so we ignore it.
-  lifecycle {
-    ignore_changes = [
-      parameters["DdApiKey"]
-    ]
-  }
-
-  depends_on = [datadog_integration_aws.default]
-}
-
-resource "datadog_integration_aws_lambda_arn" "default" {
-  count = var.install_log_forwarder ? 1 : 0
-
-  account_id = data.aws_caller_identity.current.account_id
-  lambda_arn = aws_cloudformation_stack.datadog_forwarder[0].outputs["DatadogForwarderArn"]
-}
-
-resource "datadog_integration_aws_log_collection" "default" {
-  count = var.log_collection_services != null ? 1 : 0
-
-  account_id = data.aws_caller_identity.current.account_id
-  services   = var.log_collection_services
-
-  depends_on = [aws_cloudformation_stack.datadog_forwarder]
+  dd_api_key_secret_arn = aws_secretsmanager_secret.api_key[0].arn
+  dd_site               = var.site_url
+  dd_tags               = join(",", var.datadog_tags)
+  function_name         = var.log_forwarder_name
+  layer_version         = var.log_forwarder_layer_version
+  reserved_concurrency  = var.log_forwarder_reserved_concurrency
 }

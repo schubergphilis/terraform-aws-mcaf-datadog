@@ -35,13 +35,6 @@ run "install_log_forwarder" {
     api_key               = "1234567890"
   }
 
-  override_data {
-    target = data.http.datadog_forwarder_yaml_url
-    values = {
-      response_body = "test"
-    }
-  }
-
   module {
     source = "./"
   }

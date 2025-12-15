@@ -6,5 +6,5 @@ output "api_key" {
 
 output "forwarder_arn" {
   description = "Datadog log forwarder lambda ARN"
-  value       = var.install_log_forwarder ? aws_cloudformation_stack.datadog_forwarder[0].outputs["DatadogForwarderArn"] : ""
+  value       = var.install_log_forwarder ? module.datadog_forwarder.datadog_forwarder_arn : ""
 }

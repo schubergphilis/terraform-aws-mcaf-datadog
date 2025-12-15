@@ -34,16 +34,16 @@ variable "datadog_tags" {
   description = "Array of tags (in the form key:value) to add to all hosts and metrics"
 }
 
-variable "excluded_regions" {
-  type        = list(string)
-  default     = []
-  description = "List of regions to be excluded from metrics collection in Datadog integration"
-}
-
 variable "extended_resource_collection_enabled" {
   type        = bool
   default     = false
   description = "Whether Datadog collects additional attributes and configuration information about the resources in your AWS account"
+}
+
+variable "included_regions" {
+  type        = list(string)
+  default     = []
+  description = "List of regions to be included for metrics collection in Datadog integration. If empty, all regions are included."
 }
 
 variable "install_log_forwarder" {
@@ -63,12 +63,6 @@ variable "log_collection_services" {
   description = "A list of services to collect logs from. Valid values are s3/elb/elbv2/cloudfront/redshift/lambda."
 }
 
-variable "log_forwarder_cloudformation_sns_topic" {
-  type        = list(string)
-  default     = null
-  description = "SNS topic ARN to receive stack events from the datadog forwarder cloudformation stack"
-}
-
 variable "log_forwarder_name" {
   type        = string
   default     = "datadog-forwarder"
@@ -81,10 +75,10 @@ variable "log_forwarder_reserved_concurrency" {
   description = "AWS log forwarder reserved concurrency"
 }
 
-variable "log_forwarder_version" {
+variable "log_forwarder_layer_version" {
   type        = string
   default     = "latest"
-  description = "AWS log forwarder version to install"
+  description = "AWS log forwarder layer version to install"
 }
 
 variable "metric_tag_filters" {
@@ -98,10 +92,14 @@ variable "metric_tag_filters" {
   }
 }
 
-variable "namespace_rules" {
-  type        = list(string)
-  default     = []
-  description = "Explicit list of namespaces to enable for metrics collection. If not specific, default namespaces are enabled"
+variable "namespace_filters" {
+  type = object({
+    exclude_only = optional(list(string), ["AWS/SQS", "AWS/ElasticMapReduce", "AWS/Usage"])
+    include_only = optional(list(string), null)
+  })
+  default = {
+    exclude_only = ["AWS/SQS", "AWS/ElasticMapReduce", "AWS/Usage"]
+  }
 }
 
 variable "site_url" {
