@@ -7,7 +7,7 @@
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.0.0 |
-| <a name="requirement_datadog"></a> [datadog](#requirement\_datadog) | >= 4.0.0 |
+| <a name="requirement_datadog"></a> [datadog](#requirement\_datadog) | >= 3.84.0 |
 | <a name="requirement_http"></a> [http](#requirement\_http) | >= 3.0 |
 
 ## Providers
@@ -15,7 +15,7 @@
 | Name | Version |
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.0.0 |
-| <a name="provider_datadog"></a> [datadog](#provider\_datadog) | >= 4.0.0 |
+| <a name="provider_datadog"></a> [datadog](#provider\_datadog) | >= 3.84.0 |
 | <a name="provider_http"></a> [http](#provider\_http) | >= 3.0 |
 
 ## Modules
@@ -55,8 +55,8 @@
 | <a name="input_datadog_integration_role_name"></a> [datadog\_integration\_role\_name](#input\_datadog\_integration\_role\_name) | Name of the Datadog integration role. | `string` | `"DatadogAWSIntegrationRole"` | no |
 | <a name="input_datadog_resource_collection_policy_name"></a> [datadog\_resource\_collection\_policy\_name](#input\_datadog\_resource\_collection\_policy\_name) | Name of the Datadog resource collection policy. | `string` | `"DatadogResourceCollectionPolicy"` | no |
 | <a name="input_datadog_tags"></a> [datadog\_tags](#input\_datadog\_tags) | Array of tags (in the form key:value) to add to all hosts and metrics | `list(string)` | `[]` | no |
-| <a name="input_excluded_regions"></a> [excluded\_regions](#input\_excluded\_regions) | List of regions to be excluded from metrics collection in Datadog integration | `list(string)` | `[]` | no |
 | <a name="input_extended_resource_collection_enabled"></a> [extended\_resource\_collection\_enabled](#input\_extended\_resource\_collection\_enabled) | Whether Datadog collects additional attributes and configuration information about the resources in your AWS account | `bool` | `false` | no |
+| <a name="input_included_regions"></a> [included\_regions](#input\_included\_regions) | List of regions to be included in metrics collection for Datadog integration.<br/>When empty (default), all regions are included (include\_all behavior).<br/><br/>Example to include only specific regions:<br/>included\_regions = ["us-east-1", "us-west-2", "eu-west-1"] | `list(string)` | `[]` | no |
 | <a name="input_install_log_forwarder"></a> [install\_log\_forwarder](#input\_install\_log\_forwarder) | Set to true to install the Datadog Log Forwarder (requires var.api\_key to be set) | `bool` | `false` | no |
 | <a name="input_log_collection_services"></a> [log\_collection\_services](#input\_log\_collection\_services) | A list of services to collect logs from. Valid values are s3/elb/elbv2/cloudfront/redshift/lambda. | `list(string)` | `null` | no |
 | <a name="input_log_forwarder_cloudformation_sns_topic"></a> [log\_forwarder\_cloudformation\_sns\_topic](#input\_log\_forwarder\_cloudformation\_sns\_topic) | SNS topic ARN to receive stack events from the datadog forwarder cloudformation stack | `list(string)` | `null` | no |
