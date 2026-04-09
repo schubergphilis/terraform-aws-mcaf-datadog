@@ -1,8 +1,8 @@
 locals {
   datadog_aws_account_id                  = "464622532012"
   datadog_forwarder_yaml                  = data.http.datadog_forwarder_yaml_url.response_body
-  datadog_integration_role_name           = "DatadogAWSIntegrationRole"
-  datadog_resource_collection_policy_name = "DatadogResourceCollectionPolicy"
+  datadog_integration_role_name           = var.datadog_integration_role_name
+  datadog_resource_collection_policy_name = var.datadog_resource_collection_policy_name
   datadog_resource_collection_enabled     = var.cspm_resource_collection_enabled || var.extended_resource_collection_enabled ? true : false
 
   enabled_namespaces = length(var.namespace_rules) == 0 ? null : {
@@ -64,6 +64,7 @@ data "aws_iam_policy_document" "datadog_integration_policy" {
   #checkov:skip=CKV_AWS_109: Policy cannot be more scoped down, this is the recommended policy by datadog
   statement {
     actions = [
+      "account:GetAccountInformation",
       "apigateway:GET",
       "aoss:BatchGetCollection",
       "aoss:ListCollections",

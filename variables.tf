@@ -28,6 +28,18 @@ variable "create_api_key" {
   description = "Set to true to have this module create a Datadog API key. Warning: Datadog allows a maximum of 50 API keys per organization by default."
 }
 
+variable "datadog_integration_role_name" {
+  type        = string
+  default     = "DatadogAWSIntegrationRole"
+  description = "Name of the Datadog integration role."
+}
+
+variable "datadog_resource_collection_policy_name" {
+  type        = string
+  default     = "DatadogResourceCollectionPolicy"
+  description = "Name of the Datadog resource collection policy."
+}
+
 variable "datadog_tags" {
   type        = list(string)
   default     = []
