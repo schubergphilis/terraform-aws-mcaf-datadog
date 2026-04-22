@@ -5,6 +5,20 @@ All notable changes to this project will automatically be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.9.1 - 2026-04-22
+
+### What's Changed
+
+#### 🐛 Bug Fixes
+
+* fix: use variables for iam role name and collection policy (#42) @onitu-sbp
+
+#### 🧺 Miscellaneous
+
+* fix: use variables for iam role name and collection policy (#42) @onitu-sbp
+
+**Full Changelog**: https://github.com/schubergphilis/terraform-aws-mcaf-datadog/compare/v0.9.0...v0.9.1
+
 ## v0.9.0 - 2025-03-19
 
 ### What's Changed
