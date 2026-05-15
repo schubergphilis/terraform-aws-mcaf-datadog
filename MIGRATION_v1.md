@@ -58,7 +58,7 @@ This will download the new module version and upgrade the Datadog provider.
 terraform plan
 ```
 
-**Expected output**: You should see messages indicating resources are being moved:
+**Expected output**: You should see messages indicating resources are being created/removed:
 
 ```
 # datadog_integration_aws.default has moved to datadog_integration_aws_account.default
