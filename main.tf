@@ -44,24 +44,12 @@ resource "datadog_integration_aws_account" "default" {
   }
 }
 
-# State migration block for users upgrading from deprecated resource
-moved {
-  from = datadog_integration_aws.default
-  to   = datadog_integration_aws_account.default
-}
-
 resource "datadog_integration_aws_account_tag_filter" "default" {
   for_each = var.metric_tag_filters
 
   account_id     = datadog_integration_aws_account.default.account_id
   namespace      = each.key
   tag_filter_str = each.value
-}
-
-# State migration block for users upgrading from deprecated resource
-moved {
-  from = datadog_integration_aws_tag_filter.default
-  to   = datadog_integration_aws_account_tag_filter.default
 }
 
 data "aws_iam_policy_document" "datadog_integration_assume_role" {
@@ -473,12 +461,6 @@ resource "datadog_integration_aws_account_lambda_arn" "default" {
   lambda_arn = aws_cloudformation_stack.datadog_forwarder[0].outputs["DatadogForwarderArn"]
 }
 
-# State migration block for users upgrading from deprecated resource
-moved {
-  from = datadog_integration_aws_lambda_arn.default
-  to   = datadog_integration_aws_account_lambda_arn.default
-}
-
 resource "datadog_integration_aws_account_log_collection" "default" {
   count = var.log_collection_services != null ? 1 : 0
 
@@ -486,10 +468,4 @@ resource "datadog_integration_aws_account_log_collection" "default" {
   services   = var.log_collection_services
 
   depends_on = [aws_cloudformation_stack.datadog_forwarder]
-}
-
-# State migration block for users upgrading from deprecated resource
-moved {
-  from = datadog_integration_aws_log_collection.default
-  to   = datadog_integration_aws_account_log_collection.default
 }
