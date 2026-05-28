@@ -11,11 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### 🐛 Bug Fixes
 
-- fix: use variables for iam role name and collection policy (#42) @onitu-sbp
+* fix: use variables for iam role name and collection policy (#42) @onitu-sbp
 
 #### 🧺 Miscellaneous
 
-- fix: use variables for iam role name and collection policy (#42) @onitu-sbp
+* fix: use variables for iam role name and collection policy (#42) @onitu-sbp
 
 **Full Changelog**: https://github.com/schubergphilis/terraform-aws-mcaf-datadog/compare/v0.9.0...v0.9.1
 
@@ -25,12 +25,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### 🚀 Features
 
-- feature: option to create Datadog API key (#38) @mlflr
+* feature: option to create Datadog API key (#38) @mlflr
 
 #### 🧺 Miscellaneous
 
-- chore: update resource collection policy (#40) @mlflr
-- chore: update DatadogAWSIntegrationRole policy (#39) @mlflr
+* chore: update resource collection policy (#40) @mlflr
+* chore: update DatadogAWSIntegrationRole policy (#39) @mlflr
 
 **Full Changelog**: https://github.com/schubergphilis/terraform-aws-mcaf-datadog/compare/v0.8.5...v0.9.0
 
@@ -40,7 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### 🐛 Bug Fixes
 
-- fix: Bump minimum required DD provider as extended resource collection field was added in 3.39.0 (#36) @stefanwb
+* fix: Bump minimum required DD provider as extended resource collection field was added in 3.39.0 (#36) @stefanwb
 
 **Full Changelog**: https://github.com/schubergphilis/terraform-aws-mcaf-datadog/compare/v0.8.4...v0.8.5
 
@@ -50,7 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### 🐛 Bug Fixes
 
-- bug: resource_collection logic fix (#35) @Plork
+* bug: resource_collection logic fix (#35) @Plork
 
 **Full Changelog**: https://github.com/schubergphilis/terraform-aws-mcaf-datadog/compare/v0.8.3...v0.8.4
 
@@ -60,7 +60,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### 🐛 Bug Fixes
 
-- fix: policy should still be created without enabling cloud security (#34) @Plork
+* fix: policy should still be created without enabling cloud security (#34) @Plork
 
 **Full Changelog**: https://github.com/schubergphilis/terraform-aws-mcaf-datadog/compare/v0.8.2...v0.8.3
 
@@ -70,7 +70,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### 🐛 Bug Fixes
 
-- bug: cannot be empty for policies (#33) @Plork
+* bug: cannot be empty for policies (#33) @Plork
 
 **Full Changelog**: https://github.com/schubergphilis/terraform-aws-mcaf-datadog/compare/v0.8.1...v0.8.2
 
@@ -80,7 +80,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### 🐛 Bug Fixes
 
-- bug: correct arn of policy! (#32) @Plork
+* bug: correct arn of policy! (#32) @Plork
 
 **Full Changelog**: https://github.com/schubergphilis/terraform-aws-mcaf-datadog/compare/v0.8.0...v0.8.1
 
@@ -90,7 +90,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### 🚀 Features
 
-- feat: additional AWS resource collection IAM policy (#31) @Plork
+* feat: additional AWS resource collection IAM policy (#31) @Plork
 
 **Full Changelog**: https://github.com/schubergphilis/terraform-aws-mcaf-datadog/compare/v0.7.1...v0.8.0
 
@@ -100,7 +100,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### 🐛 Bug Fixes
 
-- fix: Dependency fixes. (#30) @fatbasstard
+* fix: Dependency fixes. (#30) @fatbasstard
 
 **Full Changelog**: https://github.com/schubergphilis/terraform-aws-mcaf-datadog/compare/v0.7.0...v0.7.1
 
@@ -110,15 +110,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### 🚀 Features
 
-- feature: Add metrics tag filter (#29) @fatbasstard
+* feature: Add metrics tag filter (#29) @fatbasstard
 
 #### 🐛 Bug Fixes
 
-- fix: correct policy ARN (#28) @Plork
+* fix: correct policy ARN (#28) @Plork
 
 #### 📖 Documentation
 
-- feature: Add metrics tag filter (#29) @fatbasstard
+* feature: Add metrics tag filter (#29) @fatbasstard
 
 **Full Changelog**: https://github.com/schubergphilis/terraform-aws-mcaf-datadog/compare/v0.6.0...v0.7.0
 
@@ -128,7 +128,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### 🚀 Features
 
-- feat: enable Datadog resource collection for cloud security (#27) @Plork
+* feat: enable Datadog resource collection for cloud security (#27) @Plork
 
 **Full Changelog**: https://github.com/schubergphilis/terraform-aws-mcaf-datadog/compare/v0.5.0...v0.6.0
 
@@ -138,7 +138,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### 🚀 Features
 
-- feature: Add configuration of the enabled namespaces (#25) @fatbasstard
+* feature: Add configuration of the enabled namespaces (#25) @fatbasstard
 
 **Full Changelog**: https://github.com/schubergphilis/terraform-aws-mcaf-datadog/compare/v0.4.0...v0.5.0
 
@@ -148,10 +148,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### 🚀 Features
 
-- fix: Let datadog_integration_aws_log_collection depend on the cloudformation stack to prevent deployment issues & refactoring module (#24) @jschilperoord
+* fix: Let datadog_integration_aws_log_collection depend on the cloudformation stack to prevent deployment issues & refactoring module (#24) @jschilperoord
 
 #### 🐛 Bug Fixes
 
-- fix: Let datadog_integration_aws_log_collection depend on the cloudformation stack to prevent deployment issues & refactoring module (#24) @jschilperoord
+* fix: Let datadog_integration_aws_log_collection depend on the cloudformation stack to prevent deployment issues & refactoring module (#24) @jschilperoord
 
 **Full Changelog**: https://github.com/schubergphilis/terraform-aws-mcaf-datadog/compare/v0.3.12...v0.4.0
