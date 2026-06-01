@@ -49,8 +49,8 @@ run "install_log_forwarder" {
   command = plan
 
   assert {
-    condition     = resource.datadog_integration_aws_account_lambda_arn.default[0] != null
-    error_message = "The log forwarder was not installed"
+    condition     = length(resource.datadog_integration_aws_account.default.logs_config.lambda_forwarder.lambdas) > 0
+    error_message = "The log forwarder lambda was not configured"
   }
 
   assert {
@@ -82,12 +82,12 @@ run "enabled_resource_collection" {
   }
 
   assert {
-    condition     = resource.datadog_integration_aws_account.default.extended_resource_collection_enabled == "true"
+    condition     = resource.datadog_integration_aws_account.default.resources_config.extended_collection == true
     error_message = "The extended resource collection was not enabled"
   }
 
   assert {
-    condition     = resource.datadog_integration_aws_account.default.cspm_resource_collection_enabled == "false"
+    condition     = resource.datadog_integration_aws_account.default.resources_config.cloud_security_posture_management_collection == false
     error_message = "The CSPM resource collection was enabled"
   }
 }
@@ -109,12 +109,12 @@ run "enabled_cspm" {
   }
 
   assert {
-    condition     = resource.datadog_integration_aws_account.default.extended_resource_collection_enabled == "true"
+    condition     = resource.datadog_integration_aws_account.default.resources_config.extended_collection == true
     error_message = "The extended resource collection was not enabled"
   }
 
   assert {
-    condition     = resource.datadog_integration_aws_account.default.cspm_resource_collection_enabled == "true"
-    error_message = "The CSPM resource collection was enabled"
+    condition     = resource.datadog_integration_aws_account.default.resources_config.cloud_security_posture_management_collection == true
+    error_message = "The CSPM resource collection was not enabled"
   }
 }

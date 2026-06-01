@@ -16,6 +16,24 @@ variable "api_key_name" {
   }
 }
 
+variable "automute_enabled" {
+  type        = bool
+  default     = true
+  description = "Silence monitors for expected EC2 instance shutdowns."
+}
+
+variable "collect_cloudwatch_alarms" {
+  type        = bool
+  default     = false
+  description = "Enable CloudWatch alarm collection."
+}
+
+variable "collect_custom_metrics" {
+  type        = bool
+  default     = false
+  description = "Collect custom metrics from Cloudwatch."
+}
+
 variable "cspm_resource_collection_enabled" {
   type        = bool
   default     = false
@@ -26,18 +44,6 @@ variable "create_api_key" {
   type        = bool
   default     = false
   description = "Set to true to have this module create a Datadog API key. Warning: Datadog allows a maximum of 50 API keys per organization by default."
-}
-
-variable "datadog_integration_role_name" {
-  type        = string
-  default     = "DatadogAWSIntegrationRole"
-  description = "Name of the Datadog integration role."
-}
-
-variable "datadog_resource_collection_policy_name" {
-  type        = string
-  default     = "DatadogResourceCollectionPolicy"
-  description = "Name of the Datadog resource collection policy."
 }
 
 variable "datadog_tags" {
@@ -132,4 +138,16 @@ variable "tags" {
   type        = map(string)
   description = "A mapping of tags to assign to the bucket"
   default     = {}
+}
+
+variable "xray_services" {
+  type        = list(string)
+  default     = []
+  description = <<-EOT
+    List of xray services to be included in traces collection for Datadog integration.
+    When empty (default), all xray services are included (include_all behavior).
+
+    Example to include only specific services:
+    xray_services = ["lambda", "appsync"]
+  EOT
 }
