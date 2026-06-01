@@ -22,7 +22,7 @@
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_datadog_integration_role"></a> [datadog\_integration\_role](#module\_datadog\_integration\_role) | schubergphilis/mcaf-role/aws | ~> 0.4.0 |
+| <a name="module_datadog_integration_role"></a> [datadog\_integration\_role](#module\_datadog\_integration\_role) | schubergphilis/mcaf-role/aws | ~> 0.5.3 |
 
 ## Resources
 
@@ -34,9 +34,7 @@
 | [aws_secretsmanager_secret_version.api_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
 | [datadog_api_key.default](https://registry.terraform.io/providers/datadog/datadog/latest/docs/resources/api_key) | resource |
 | [datadog_integration_aws_account.default](https://registry.terraform.io/providers/datadog/datadog/latest/docs/resources/integration_aws_account) | resource |
-| [datadog_integration_aws_account_lambda_arn.default](https://registry.terraform.io/providers/datadog/datadog/latest/docs/resources/integration_aws_account_lambda_arn) | resource |
-| [datadog_integration_aws_account_log_collection.default](https://registry.terraform.io/providers/datadog/datadog/latest/docs/resources/integration_aws_account_log_collection) | resource |
-| [datadog_integration_aws_account_tag_filter.default](https://registry.terraform.io/providers/datadog/datadog/latest/docs/resources/integration_aws_account_tag_filter) | resource |
+| [datadog_integration_aws_external_id.default](https://registry.terraform.io/providers/datadog/datadog/latest/docs/resources/integration_aws_external_id) | resource |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_iam_policy_document.datadog_integration_assume_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.datadog_integration_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
@@ -50,10 +48,11 @@
 |------|-------------|------|---------|:--------:|
 | <a name="input_api_key"></a> [api\_key](#input\_api\_key) | Datadog API key | `string` | `null` | no |
 | <a name="input_api_key_name"></a> [api\_key\_name](#input\_api\_key\_name) | Name of the Datadog API key used if create\_api\_key is set to true, otherwise ignored | `string` | `null` | no |
+| <a name="input_automute_enabled"></a> [automute\_enabled](#input\_automute\_enabled) | Silence monitors for expected EC2 instance shutdowns. | `bool` | `true` | no |
+| <a name="input_collect_cloudwatch_alarms"></a> [collect\_cloudwatch\_alarms](#input\_collect\_cloudwatch\_alarms) | Enable CloudWatch alarm collection. | `bool` | `false` | no |
+| <a name="input_collect_custom_metrics"></a> [collect\_custom\_metrics](#input\_collect\_custom\_metrics) | Collect custom metrics from Cloudwatch. | `bool` | `false` | no |
 | <a name="input_create_api_key"></a> [create\_api\_key](#input\_create\_api\_key) | Set to true to have this module create a Datadog API key. Warning: Datadog allows a maximum of 50 API keys per organization by default. | `bool` | `false` | no |
 | <a name="input_cspm_resource_collection_enabled"></a> [cspm\_resource\_collection\_enabled](#input\_cspm\_resource\_collection\_enabled) | Whether Datadog collects cloud security posture management resources from your AWS account. | `bool` | `false` | no |
-| <a name="input_datadog_integration_role_name"></a> [datadog\_integration\_role\_name](#input\_datadog\_integration\_role\_name) | Name of the Datadog integration role. | `string` | `"DatadogAWSIntegrationRole"` | no |
-| <a name="input_datadog_resource_collection_policy_name"></a> [datadog\_resource\_collection\_policy\_name](#input\_datadog\_resource\_collection\_policy\_name) | Name of the Datadog resource collection policy. | `string` | `"DatadogResourceCollectionPolicy"` | no |
 | <a name="input_datadog_tags"></a> [datadog\_tags](#input\_datadog\_tags) | Array of tags (in the form key:value) to add to all hosts and metrics | `list(string)` | `[]` | no |
 | <a name="input_extended_resource_collection_enabled"></a> [extended\_resource\_collection\_enabled](#input\_extended\_resource\_collection\_enabled) | Whether Datadog collects additional attributes and configuration information about the resources in your AWS account | `bool` | `false` | no |
 | <a name="input_included_regions"></a> [included\_regions](#input\_included\_regions) | List of regions to be included in metrics collection for Datadog integration.<br/>When empty (default), all regions are included (include\_all behavior).<br/><br/>Example to include only specific regions:<br/>included\_regions = ["us-east-1", "us-west-2", "eu-west-1"] | `list(string)` | `[]` | no |
@@ -67,6 +66,7 @@
 | <a name="input_namespace_rules"></a> [namespace\_rules](#input\_namespace\_rules) | Explicit list of namespaces to enable for metrics collection. If not specific, default namespaces are enabled | `list(string)` | `[]` | no |
 | <a name="input_site_url"></a> [site\_url](#input\_site\_url) | Define your Datadog Site to send data to. For the Datadog US site, set to datadoghq.com | `string` | `"datadoghq.eu"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A mapping of tags to assign to the bucket | `map(string)` | `{}` | no |
+| <a name="input_xray_services"></a> [xray\_services](#input\_xray\_services) | List of xray services to be included in traces collection for Datadog integration.<br/>When empty (default), all xray services are included (include\_all behavior).<br/><br/>Example to include only specific services:<br/>xray\_services = ["lambda", "appsync"] | `list(string)` | `[]` | no |
 
 ## Outputs
 
