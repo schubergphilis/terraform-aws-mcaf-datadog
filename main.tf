@@ -97,9 +97,10 @@ data "aws_iam_policy_document" "datadog_integration_assume_role" {
 
 data "aws_iam_policy_document" "datadog_integration_policy" {
   #https://docs.datadoghq.com/integrations/amazon_web_services/#aws-integration-iam-policy
+  #checkov:skip=CKV_AWS_108: Policy cannot be more scoped down, this is the recommended policy by datadog
+  #checkov:skip=CKV_AWS_109: Policy cannot be more scoped down, this is the recommended policy by datadog
   #checkov:skip=CKV_AWS_111: Resource wildcard cannot be scoped because it's not known beforehand which exact resources datadog need to be able to scrape
   #checkov:skip=CKV_AWS_356: Policy cannot be more scoped down, this is the recommended policy by datadog
-  #checkov:skip=CKV_AWS_109: Policy cannot be more scoped down, this is the recommended policy by datadog
   statement {
     actions = [
       "account:GetAccountInformation",
