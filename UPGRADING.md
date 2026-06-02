@@ -16,7 +16,7 @@ The following variables have been added:
 
 - `automute_enabled`: defaults to `true`
 - `collect_cloudwatch_alarms`: defaults to `false`
-- `collect_custom_metrics`: defaults to `false`
+- `collect_custom_metrics`: defaults to `false`. This aligns with the provider defaults, but might be different from previous module version. Check your plan.
 - `included_regions`: defaults to `[]`, resulting in all regions being included
 - `xray_services`: defaults to `[]`, resulting in all X-Ray services being included
 

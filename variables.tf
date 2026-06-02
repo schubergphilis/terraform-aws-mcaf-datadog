@@ -31,7 +31,7 @@ variable "collect_cloudwatch_alarms" {
 variable "collect_custom_metrics" {
   type        = bool
   default     = false
-  description = "Collect custom metrics from Cloudwatch."
+  description = "Enable custom metrics collection."
 }
 
 variable "cspm_resource_collection_enabled" {
