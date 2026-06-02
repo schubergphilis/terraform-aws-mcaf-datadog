@@ -5,10 +5,17 @@ locals {
   datadog_resource_collection_policy_name = "DatadogResourceCollectionPolicy"
   datadog_resource_collection_enabled     = var.cspm_resource_collection_enabled || var.extended_resource_collection_enabled ? true : false
 
-  enabled_namespaces = length(var.namespace_rules) == 0 ? null : [
+  excluded_namespaces = length(var.namespace_rules) == 0 ? null : [
     for namespace in toset(data.datadog_integration_aws_namespace_rules.rules.namespace_rules) :
     namespace if !contains(var.namespace_rules, namespace)
   ]
+}
+
+check "namespace_rules" {
+  assert {
+    condition     = alltrue([for namespace in var.namespace_rules : contains(data.datadog_integration_aws_namespace_rules.rules.namespace_rules, namespace)])
+    error_message = "One or more provided namespaces in var.namespace_rules are invalid. Use data.datadog_integration_aws_namespace_rules to get the list of valid namespaces."
+  }
 }
 
 data "aws_caller_identity" "current" {}
@@ -49,7 +56,7 @@ resource "datadog_integration_aws_account" "default" {
     collect_cloudwatch_alarms = var.collect_cloudwatch_alarms
     collect_custom_metrics    = var.collect_custom_metrics
     namespace_filters {
-      exclude_only = local.enabled_namespaces
+      exclude_only = local.excluded_namespaces
     }
     dynamic "tag_filters" {
       for_each = var.metric_tag_filters
