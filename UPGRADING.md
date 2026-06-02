@@ -8,6 +8,8 @@ This document captures required refactoring on your part when upgrading to a mod
 
 Version 1.0.0 migrates from deprecated `datadog_integration_aws*` resources to the new `datadog_integration_aws_account` resource introduced in Datadog provider v3.50.0.
 
+_Note: While the module supports Datadog provider 4.x, you first need to migrate to the new resources using provider version 3.x. After the first run, you can update. This prevents `no schema found` errors related to the deprecated resources that were removed in version 4.x._
+
 #### Variables
 
 The following variables have been added:
