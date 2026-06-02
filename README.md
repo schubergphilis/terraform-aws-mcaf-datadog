@@ -52,7 +52,7 @@
 | <a name="input_api_key_name"></a> [api\_key\_name](#input\_api\_key\_name) | Name of the Datadog API key used if create\_api\_key is set to true, otherwise ignored | `string` | `null` | no |
 | <a name="input_automute_enabled"></a> [automute\_enabled](#input\_automute\_enabled) | Silence monitors for expected EC2 instance shutdowns. | `bool` | `true` | no |
 | <a name="input_collect_cloudwatch_alarms"></a> [collect\_cloudwatch\_alarms](#input\_collect\_cloudwatch\_alarms) | Enable CloudWatch alarm collection. | `bool` | `false` | no |
-| <a name="input_collect_custom_metrics"></a> [collect\_custom\_metrics](#input\_collect\_custom\_metrics) | Collect custom metrics from Cloudwatch. | `bool` | `false` | no |
+| <a name="input_collect_custom_metrics"></a> [collect\_custom\_metrics](#input\_collect\_custom\_metrics) | Enable custom metrics collection. | `bool` | `false` | no |
 | <a name="input_create_api_key"></a> [create\_api\_key](#input\_create\_api\_key) | Set to true to have this module create a Datadog API key. Warning: Datadog allows a maximum of 50 API keys per organization by default. | `bool` | `false` | no |
 | <a name="input_cspm_resource_collection_enabled"></a> [cspm\_resource\_collection\_enabled](#input\_cspm\_resource\_collection\_enabled) | Whether Datadog collects cloud security posture management resources from your AWS account. | `bool` | `false` | no |
 | <a name="input_datadog_tags"></a> [datadog\_tags](#input\_datadog\_tags) | Array of tags (in the form key:value) to add to all hosts and metrics | `list(string)` | `[]` | no |
