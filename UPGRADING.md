@@ -10,6 +10,8 @@ Version 1.0.0 migrates from deprecated `datadog_integration_aws*` resources to t
 
 _Note: While the module supports Datadog provider 4.x, you first need to migrate to the new resources using provider version 3.x. After the first run, you can update. This prevents `no schema found` errors related to the deprecated resources that were removed in version 4.x._
 
+Permissions for the integration role are now managed via a data source provided by the Datadog provider. As a result, permissions may change after the initial deployment, and new permissions can be added without requiring a maintenance release. This means some drift can occur naturally, so please review any changes using `terraform plan` before applying.
+
 #### Variables
 
 The following variables have been added:
