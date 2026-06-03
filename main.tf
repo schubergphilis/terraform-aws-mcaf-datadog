@@ -1,13 +1,20 @@
 locals {
   datadog_aws_account_id                  = "464622532012"
   datadog_forwarder_yaml                  = data.http.datadog_forwarder_yaml_url.response_body
-  datadog_integration_role_name           = var.datadog_integration_role_name
-  datadog_resource_collection_policy_name = var.datadog_resource_collection_policy_name
+  datadog_integration_role_name           = "DatadogAWSIntegrationRole"
+  datadog_resource_collection_policy_name = "DatadogResourceCollectionPolicy"
   datadog_resource_collection_enabled     = var.cspm_resource_collection_enabled || var.extended_resource_collection_enabled ? true : false
 
-  enabled_namespaces = length(var.namespace_rules) == 0 ? null : {
-    for index, namespace in toset(data.datadog_integration_aws_namespace_rules.rules.namespace_rules) :
-    namespace => contains(var.namespace_rules, namespace)
+  excluded_namespaces = length(var.namespace_rules) == 0 ? null : [
+    for namespace in toset(data.datadog_integration_aws_namespace_rules.rules.namespace_rules) :
+    namespace if !contains(var.namespace_rules, namespace)
+  ]
+}
+
+check "namespace_rules" {
+  assert {
+    condition     = alltrue([for namespace in var.namespace_rules : contains(data.datadog_integration_aws_namespace_rules.rules.namespace_rules, namespace)])
+    error_message = "One or more provided namespaces in var.namespace_rules are invalid. Use data.datadog_integration_aws_namespace_rules to get the list of valid namespaces."
   }
 }
 
@@ -19,22 +26,60 @@ data "http" "datadog_forwarder_yaml_url" {
 
 data "datadog_integration_aws_namespace_rules" "rules" {}
 
-resource "datadog_integration_aws" "default" {
-  account_id                           = data.aws_caller_identity.current.account_id
-  account_specific_namespace_rules     = local.enabled_namespaces
-  cspm_resource_collection_enabled     = var.cspm_resource_collection_enabled
-  excluded_regions                     = var.excluded_regions
-  extended_resource_collection_enabled = local.datadog_resource_collection_enabled
-  host_tags                            = var.datadog_tags
-  role_name                            = local.datadog_integration_role_name
-}
+resource "datadog_integration_aws_external_id" "default" {}
 
-resource "datadog_integration_aws_tag_filter" "default" {
-  for_each = var.metric_tag_filters
+resource "datadog_integration_aws_account" "default" {
+  account_tags   = var.datadog_tags
+  aws_account_id = data.aws_caller_identity.current.account_id
+  aws_partition  = "aws"
+  aws_regions {
+    include_all  = length(var.included_regions) == 0 ? true : null
+    include_only = length(var.included_regions) > 0 ? var.included_regions : null
+  }
 
-  account_id     = datadog_integration_aws.default.account_id
-  namespace      = each.key
-  tag_filter_str = each.value
+  auth_config {
+    aws_auth_config_role {
+      role_name   = local.datadog_integration_role_name
+      external_id = datadog_integration_aws_external_id.default.id
+    }
+  }
+
+  logs_config {
+    lambda_forwarder {
+      lambdas = var.install_log_forwarder ? [aws_cloudformation_stack.datadog_forwarder[0].outputs["DatadogForwarderArn"]] : []
+      sources = var.log_collection_services != null ? var.log_collection_services : []
+    }
+  }
+
+  metrics_config {
+    automute_enabled          = var.automute_enabled
+    collect_cloudwatch_alarms = var.collect_cloudwatch_alarms
+    collect_custom_metrics    = var.collect_custom_metrics
+    namespace_filters {
+      exclude_only = local.excluded_namespaces
+    }
+    dynamic "tag_filters" {
+      for_each = var.metric_tag_filters
+      content {
+        namespace = tag_filters.key
+        tags      = tag_filters.value
+      }
+    }
+  }
+
+  resources_config {
+    cloud_security_posture_management_collection = var.cspm_resource_collection_enabled
+    extended_collection                          = local.datadog_resource_collection_enabled
+  }
+
+  traces_config {
+    xray_services {
+      include_all  = length(var.xray_services) == 2 ? true : null
+      include_only = length(var.xray_services) < 2 ? var.xray_services : null
+    }
+  }
+
+  depends_on = [datadog_integration_aws_external_id.default]
 }
 
 data "aws_iam_policy_document" "datadog_integration_assume_role" {
@@ -51,315 +96,28 @@ data "aws_iam_policy_document" "datadog_integration_assume_role" {
       variable = "sts:ExternalId"
 
       values = [
-        datadog_integration_aws.default.external_id
+        datadog_integration_aws_external_id.default.id
       ]
     }
   }
 }
 
+data "datadog_integration_aws_iam_permissions" "default" {}
+
+data "datadog_integration_aws_iam_permissions_resource_collection" "default" {}
+
 data "aws_iam_policy_document" "datadog_integration_policy" {
   #https://docs.datadoghq.com/integrations/amazon_web_services/#aws-integration-iam-policy
-  #checkov:skip=CKV_AWS_111: Resource wildcard cannot be scoped because it's not known beforehand which exact resources datadog need to be able to scrape
-  #checkov:skip=CKV_AWS_356: Policy cannot be more scoped down, this is the recommended policy by datadog
-  #checkov:skip=CKV_AWS_109: Policy cannot be more scoped down, this is the recommended policy by datadog
   statement {
-    actions = [
-      "account:GetAccountInformation",
-      "apigateway:GET",
-      "aoss:BatchGetCollection",
-      "aoss:ListCollections",
-      "autoscaling:Describe*",
-      "backup:List*",
-      "bcm-data-exports:GetExport",
-      "bcm-data-exports:ListExports",
-      "bedrock:GetAgent",
-      "bedrock:GetAgentAlias",
-      "bedrock:GetFlow",
-      "bedrock:GetFlowAlias",
-      "bedrock:GetGuardrail",
-      "bedrock:GetImportedModel",
-      "bedrock:GetInferenceProfile",
-      "bedrock:GetMarketplaceModelEndpoint",
-      "bedrock:ListAgentAliases",
-      "bedrock:ListAgents",
-      "bedrock:ListFlowAliases",
-      "bedrock:ListFlows",
-      "bedrock:ListGuardrails",
-      "bedrock:ListImportedModels",
-      "bedrock:ListInferenceProfiles",
-      "bedrock:ListMarketplaceModelEndpoints",
-      "bedrock:ListPromptRouters",
-      "bedrock:ListProvisionedModelThroughputs",
-      "budgets:ViewBudget",
-      "cassandra:Select",
-      "cloudfront:GetDistributionConfig",
-      "cloudfront:ListDistributions",
-      "cloudtrail:DescribeTrails",
-      "cloudtrail:GetTrailStatus",
-      "cloudtrail:LookupEvents",
-      "cloudwatch:Describe*",
-      "cloudwatch:Get*",
-      "cloudwatch:List*",
-      "codeartifact:DescribeDomain",
-      "codeartifact:DescribePackageGroup",
-      "codeartifact:DescribeRepository",
-      "codeartifact:ListDomains",
-      "codeartifact:ListPackageGroups",
-      "codeartifact:ListPackages",
-      "codedeploy:BatchGet*",
-      "codedeploy:List*",
-      "codepipeline:ListWebhooks",
-      "cur:DescribeReportDefinitions",
-      "directconnect:Describe*",
-      "dynamodb:Describe*",
-      "dynamodb:List*",
-      "ec2:Describe*",
-      "ec2:GetAllowedImagesSettings",
-      "ec2:GetEbsDefaultKmsKeyId",
-      "ec2:GetInstanceMetadataDefaults",
-      "ec2:GetSerialConsoleAccessStatus",
-      "ec2:GetSnapshotBlockPublicAccessState",
-      "ec2:GetTransitGatewayPrefixListReferences",
-      "ec2:SearchTransitGatewayRoutes",
-      "ecs:Describe*",
-      "ecs:List*",
-      "elasticache:Describe*",
-      "elasticache:List*",
-      "elasticfilesystem:DescribeAccessPoints",
-      "elasticfilesystem:DescribeFileSystems",
-      "elasticfilesystem:DescribeTags",
-      "elasticloadbalancing:Describe*",
-      "elasticmapreduce:Describe*",
-      "elasticmapreduce:List*",
-      "emr-containers:ListManagedEndpoints",
-      "emr-containers:ListSecurityConfigurations",
-      "emr-containers:ListVirtualClusters",
-      "es:DescribeElasticsearchDomains",
-      "es:ListDomainNames",
-      "es:ListTags",
-      "events:CreateEventBus",
-      "fsx:DescribeFileSystems",
-      "fsx:ListTagsForResource",
-      "glacier:GetVaultNotifications",
-      "glue:ListRegistries",
-      "grafana:DescribeWorkspace",
-      "greengrass:GetComponent",
-      "greengrass:GetConnectivityInfo",
-      "greengrass:GetCoreDevice",
-      "greengrass:GetDeployment",
-      "health:DescribeAffectedEntities",
-      "health:DescribeEventDetails",
-      "health:DescribeEvents",
-      "kinesis:Describe*",
-      "kinesis:List*",
-      "lambda:GetPolicy",
-      "lambda:List*",
-      "lightsail:GetInstancePortStates",
-      "logs:DeleteSubscriptionFilter",
-      "logs:DescribeLogGroups",
-      "logs:DescribeLogStreams",
-      "logs:DescribeSubscriptionFilters",
-      "logs:FilterLogEvents",
-      "logs:PutSubscriptionFilter",
-      "logs:TestMetricFilter",
-      "macie2:GetAllowList",
-      "macie2:GetCustomDataIdentifier",
-      "macie2:ListAllowLists",
-      "macie2:ListCustomDataIdentifiers",
-      "macie2:ListMembers",
-      "macie2:GetMacieSession",
-      "managedblockchain:GetAccessor",
-      "managedblockchain:GetMember",
-      "managedblockchain:GetNetwork",
-      "managedblockchain:GetNode",
-      "managedblockchain:GetProposal",
-      "managedblockchain:ListAccessors",
-      "managedblockchain:ListInvitations",
-      "managedblockchain:ListMembers",
-      "managedblockchain:ListNodes",
-      "managedblockchain:ListProposals",
-      "memorydb:DescribeAcls",
-      "memorydb:DescribeMultiRegionClusters",
-      "memorydb:DescribeParameterGroups",
-      "memorydb:DescribeReservedNodes",
-      "memorydb:DescribeSnapshots",
-      "memorydb:DescribeSubnetGroups",
-      "memorydb:DescribeUsers",
-      "oam:ListAttachedLinks",
-      "oam:ListSinks",
-      "organizations:Describe*",
-      "organizations:List*",
-      "osis:GetPipeline",
-      "osis:GetPipelineBlueprint",
-      "osis:ListPipelineBlueprints",
-      "osis:ListPipelines",
-      "proton:GetComponent",
-      "proton:GetDeployment",
-      "proton:GetEnvironment",
-      "proton:GetEnvironmentAccountConnection",
-      "proton:GetEnvironmentTemplate",
-      "proton:GetEnvironmentTemplateVersion",
-      "proton:GetRepository",
-      "proton:GetService",
-      "proton:GetServiceInstance",
-      "proton:GetServiceTemplate",
-      "proton:GetServiceTemplateVersion",
-      "proton:ListComponents",
-      "proton:ListDeployments",
-      "proton:ListEnvironmentAccountConnections",
-      "proton:ListEnvironmentTemplateVersions",
-      "proton:ListEnvironmentTemplates",
-      "proton:ListEnvironments",
-      "proton:ListRepositories",
-      "proton:ListServiceInstances",
-      "proton:ListServiceTemplateVersions",
-      "proton:ListServiceTemplates",
-      "proton:ListServices",
-      "qldb:ListJournalKinesisStreamsForLedger",
-      "rds:Describe*",
-      "rds:List*",
-      "redshift:DescribeClusters",
-      "redshift:DescribeLoggingStatus",
-      "redshift-serverless:ListEndpointAccess",
-      "redshift-serverless:ListManagedWorkgroups",
-      "redshift-serverless:ListNamespaces",
-      "redshift-serverless:ListRecoveryPoints",
-      "redshift-serverless:ListSnapshots",
-      "route53:List*",
-      "s3:GetBucketLocation",
-      "s3:GetBucketLogging",
-      "s3:GetBucketNotification",
-      "s3:GetBucketTagging",
-      "s3:ListAccessGrants",
-      "s3:ListAllMyBuckets",
-      "s3:PutBucketNotification",
-      "s3express:GetBucketPolicy",
-      "s3express:GetEncryptionConfiguration",
-      "s3express:ListAllMyDirectoryBuckets",
-      "s3tables:GetTableBucketMaintenanceConfiguration",
-      "s3tables:ListTableBuckets",
-      "s3tables:ListTables",
-      "savingsplans:DescribeSavingsPlanRates",
-      "savingsplans:DescribeSavingsPlans",
-      "secretsmanager:GetResourcePolicy",
-      "ses:Get*",
-      "ses:ListAddonInstances",
-      "ses:ListAddonSubscriptions",
-      "ses:ListAddressLists",
-      "ses:ListArchives",
-      "ses:ListContactLists",
-      "ses:ListCustomVerificationEmailTemplates",
-      "ses:ListMultiRegionEndpoints",
-      "ses:ListIngressPoints",
-      "ses:ListRelays",
-      "ses:ListRuleSets",
-      "ses:ListTemplates",
-      "ses:ListTrafficPolicies",
-      "sns:GetSubscriptionAttributes",
-      "sns:List*",
-      "sns:Publish",
-      "sqs:ListQueues",
-      "states:DescribeStateMachine",
-      "states:ListStateMachines",
-      "support:DescribeTrustedAdvisor*",
-      "support:RefreshTrustedAdvisorCheck",
-      "tag:GetResources",
-      "tag:GetTagKeys",
-      "tag:GetTagValues",
-      "timestream:DescribeEndpoints",
-      "timestream:ListTables",
-      "waf-regional:GetRule",
-      "waf-regional:GetRuleGroup",
-      "waf-regional:ListRuleGroups",
-      "waf-regional:ListRules",
-      "waf:GetRule",
-      "waf:GetRuleGroup",
-      "waf:ListRuleGroups",
-      "waf:ListRules",
-      "wafv2:GetIPSet",
-      "wafv2:GetLoggingConfiguration",
-      "wafv2:GetRegexPatternSet",
-      "wafv2:GetRuleGroup",
-      "wafv2:ListLoggingConfigurations",
-      "workmail:DescribeOrganization",
-      "workmail:ListOrganizations",
-      "xray:BatchGetTraces",
-      "xray:GetTraceSummaries"
-    ]
+    actions   = data.datadog_integration_aws_iam_permissions.default.iam_permissions
     resources = ["*"]
   }
 }
 
 data "aws_iam_policy_document" "datadog_resource_collection_policy" {
   #https://docs.datadoghq.com/integrations/amazon_web_services/#aws-resource-collection-iam-policy
-  #checkov:skip=CKV_AWS_111: Resource wildcard cannot be scoped because it's not known beforehand which exact resources datadog need to be able to scrape
-  #checkov:skip=CKV_AWS_356: Policy cannot be more scoped down, this is the recommended policy by datadog
   statement {
-    actions = [
-      "amplify:ListApps",
-      "amplify:ListArtifacts",
-      "amplify:ListBackendEnvironments",
-      "amplify:ListBranches",
-      "amplify:ListDomainAssociations",
-      "amplify:ListJobs",
-      "amplify:ListWebhooks",
-      "appstream:DescribeAppBlockBuilders",
-      "appstream:DescribeAppBlocks",
-      "appstream:DescribeApplications",
-      "appstream:DescribeFleets",
-      "appstream:DescribeImageBuilders",
-      "appstream:DescribeImages",
-      "appstream:DescribeStacks",
-      "batch:DescribeJobQueues",
-      "batch:DescribeSchedulingPolicies",
-      "batch:ListSchedulingPolicies",
-      "deadline:GetBudget",
-      "deadline:GetLicenseEndpoint",
-      "deadline:GetQueue",
-      "deadline:ListBudgets",
-      "deadline:ListFarms",
-      "deadline:ListFleets",
-      "deadline:ListLicenseEndpoints",
-      "deadline:ListMonitors",
-      "deadline:ListQueues",
-      "deadline:ListWorkers",
-      "identitystore:DescribeGroup",
-      "identitystore:DescribeGroupMembership",
-      "imagebuilder:GetContainerRecipe",
-      "imagebuilder:GetDistributionConfiguration",
-      "imagebuilder:GetImageRecipe",
-      "imagebuilder:GetInfrastructureConfiguration",
-      "imagebuilder:GetLifecyclePolicy",
-      "imagebuilder:GetWorkflow",
-      "imagebuilder:ListComponents",
-      "imagebuilder:ListContainerRecipes",
-      "imagebuilder:ListDistributionConfigurations",
-      "imagebuilder:ListImagePipelines",
-      "imagebuilder:ListImageRecipes",
-      "imagebuilder:ListImages",
-      "imagebuilder:ListInfrastructureConfigurations",
-      "imagebuilder:ListLifecyclePolicies",
-      "imagebuilder:ListWorkflows",
-      "mobiletargeting:GetApps",
-      "mobiletargeting:GetCampaigns",
-      "mobiletargeting:GetChannels",
-      "mobiletargeting:GetEventStream",
-      "mobiletargeting:GetRecommenderConfigurations",
-      "mobiletargeting:GetSegments",
-      "mobiletargeting:ListJourneys",
-      "mobiletargeting:ListTemplates",
-      "sms-voice:DescribeConfigurationSets",
-      "sms-voice:DescribeOptOutLists",
-      "sms-voice:DescribePhoneNumbers",
-      "sms-voice:DescribePools",
-      "sms-voice:DescribeProtectConfigurations",
-      "sms-voice:DescribeRegistrationAttachments",
-      "sms-voice:DescribeRegistrations",
-      "sms-voice:DescribeSenderIds",
-      "sms-voice:DescribeVerifiedDestinationNumbers",
-      "social-messaging:ListLinkedWhatsAppBusinessAccounts"
-    ]
-
+    actions   = data.datadog_integration_aws_iam_permissions_resource_collection.default.iam_permissions
     resources = ["*"]
   }
 }
@@ -374,7 +132,7 @@ resource "aws_iam_policy" "datadog_resource_collection_policy" {
 
 module "datadog_integration_role" {
   source  = "schubergphilis/mcaf-role/aws"
-  version = "~> 0.4.0"
+  version = "~> 0.5.3"
 
   name          = local.datadog_integration_role_name
   assume_policy = data.aws_iam_policy_document.datadog_integration_assume_role.json
@@ -435,22 +193,4 @@ resource "aws_cloudformation_stack" "datadog_forwarder" {
       parameters["DdApiKey"]
     ]
   }
-
-  depends_on = [datadog_integration_aws.default]
-}
-
-resource "datadog_integration_aws_lambda_arn" "default" {
-  count = var.install_log_forwarder ? 1 : 0
-
-  account_id = data.aws_caller_identity.current.account_id
-  lambda_arn = aws_cloudformation_stack.datadog_forwarder[0].outputs["DatadogForwarderArn"]
-}
-
-resource "datadog_integration_aws_log_collection" "default" {
-  count = var.log_collection_services != null ? 1 : 0
-
-  account_id = data.aws_caller_identity.current.account_id
-  services   = var.log_collection_services
-
-  depends_on = [aws_cloudformation_stack.datadog_forwarder]
 }

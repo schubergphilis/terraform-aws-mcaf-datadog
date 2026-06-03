@@ -16,6 +16,24 @@ variable "api_key_name" {
   }
 }
 
+variable "automute_enabled" {
+  type        = bool
+  default     = true
+  description = "Silence monitors for expected EC2 instance shutdowns."
+}
+
+variable "collect_cloudwatch_alarms" {
+  type        = bool
+  default     = false
+  description = "Enable CloudWatch alarm collection."
+}
+
+variable "collect_custom_metrics" {
+  type        = bool
+  default     = false
+  description = "Enable custom metrics collection."
+}
+
 variable "cspm_resource_collection_enabled" {
   type        = bool
   default     = false
@@ -28,34 +46,28 @@ variable "create_api_key" {
   description = "Set to true to have this module create a Datadog API key. Warning: Datadog allows a maximum of 50 API keys per organization by default."
 }
 
-variable "datadog_integration_role_name" {
-  type        = string
-  default     = "DatadogAWSIntegrationRole"
-  description = "Name of the Datadog integration role."
-}
-
-variable "datadog_resource_collection_policy_name" {
-  type        = string
-  default     = "DatadogResourceCollectionPolicy"
-  description = "Name of the Datadog resource collection policy."
-}
-
 variable "datadog_tags" {
   type        = list(string)
   default     = []
   description = "Array of tags (in the form key:value) to add to all hosts and metrics"
 }
 
-variable "excluded_regions" {
-  type        = list(string)
-  default     = []
-  description = "List of regions to be excluded from metrics collection in Datadog integration"
-}
-
 variable "extended_resource_collection_enabled" {
   type        = bool
   default     = false
   description = "Whether Datadog collects additional attributes and configuration information about the resources in your AWS account"
+}
+
+variable "included_regions" {
+  type        = list(string)
+  default     = []
+  description = <<-EOT
+    List of regions to be included in metrics collection for Datadog integration.
+    When empty (default), all regions are included (include_all behavior).
+
+    Example to include only specific regions:
+    included_regions = ["us-east-1", "us-west-2", "eu-west-1"]
+  EOT
 }
 
 variable "install_log_forwarder" {
@@ -126,4 +138,16 @@ variable "tags" {
   type        = map(string)
   description = "A mapping of tags to assign to the bucket"
   default     = {}
+}
+
+variable "xray_services" {
+  type        = list(string)
+  default     = []
+  description = <<-EOT
+    List of xray services to be included in traces collection for Datadog integration.
+    When empty (default), all xray services are included (include_all behavior).
+
+    Example to include only specific services:
+    xray_services = ["lambda", "appsync"]
+  EOT
 }
