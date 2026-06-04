@@ -9,11 +9,6 @@ locals {
     for namespace in toset(data.datadog_integration_aws_available_namespaces.namespaces.aws_namespaces) :
     namespace if !contains(var.namespace_rules, namespace)
   ]
-
-  exclusive_resource_collection_permissions = setsubtract(
-    toset(data.datadog_integration_aws_iam_permissions_resource_collection.default.iam_permissions),
-    toset(data.datadog_integration_aws_iam_permissions_standard.default.iam_permissions)
-  )
 }
 
 check "namespaces" {
@@ -109,8 +104,6 @@ data "aws_iam_policy_document" "datadog_integration_assume_role" {
 
 data "datadog_integration_aws_iam_permissions_standard" "default" {}
 
-data "datadog_integration_aws_iam_permissions_resource_collection" "default" {}
-
 data "aws_iam_policy_document" "datadog_integration_policy" {
   #https://docs.datadoghq.com/integrations/amazon_web_services/#aws-integration-iam-policy
   statement {
@@ -121,8 +114,73 @@ data "aws_iam_policy_document" "datadog_integration_policy" {
 
 data "aws_iam_policy_document" "datadog_resource_collection_policy" {
   #https://docs.datadoghq.com/integrations/amazon_web_services/#aws-resource-collection-iam-policy
+  #checkov:skip=CKV_AWS_111: Resource wildcard cannot be scoped because it's not known beforehand which exact resources datadog need to be able to scrape
+  #checkov:skip=CKV_AWS_356: Policy cannot be more scoped down, this is the recommended policy by datadog
   statement {
-    actions   = local.exclusive_resource_collection_permissions
+    actions = [
+      "amplify:ListApps",
+      "amplify:ListArtifacts",
+      "amplify:ListBackendEnvironments",
+      "amplify:ListBranches",
+      "amplify:ListDomainAssociations",
+      "amplify:ListJobs",
+      "amplify:ListWebhooks",
+      "appstream:DescribeAppBlockBuilders",
+      "appstream:DescribeAppBlocks",
+      "appstream:DescribeApplications",
+      "appstream:DescribeFleets",
+      "appstream:DescribeImageBuilders",
+      "appstream:DescribeImages",
+      "appstream:DescribeStacks",
+      "batch:DescribeJobQueues",
+      "batch:DescribeSchedulingPolicies",
+      "batch:ListSchedulingPolicies",
+      "deadline:GetBudget",
+      "deadline:GetLicenseEndpoint",
+      "deadline:GetQueue",
+      "deadline:ListBudgets",
+      "deadline:ListFarms",
+      "deadline:ListFleets",
+      "deadline:ListLicenseEndpoints",
+      "deadline:ListMonitors",
+      "deadline:ListQueues",
+      "deadline:ListWorkers",
+      "identitystore:DescribeGroup",
+      "identitystore:DescribeGroupMembership",
+      "imagebuilder:GetContainerRecipe",
+      "imagebuilder:GetDistributionConfiguration",
+      "imagebuilder:GetImageRecipe",
+      "imagebuilder:GetInfrastructureConfiguration",
+      "imagebuilder:GetLifecyclePolicy",
+      "imagebuilder:GetWorkflow",
+      "imagebuilder:ListComponents",
+      "imagebuilder:ListContainerRecipes",
+      "imagebuilder:ListDistributionConfigurations",
+      "imagebuilder:ListImagePipelines",
+      "imagebuilder:ListImageRecipes",
+      "imagebuilder:ListImages",
+      "imagebuilder:ListInfrastructureConfigurations",
+      "imagebuilder:ListLifecyclePolicies",
+      "imagebuilder:ListWorkflows",
+      "mobiletargeting:GetApps",
+      "mobiletargeting:GetCampaigns",
+      "mobiletargeting:GetChannels",
+      "mobiletargeting:GetEventStream",
+      "mobiletargeting:GetRecommenderConfigurations",
+      "mobiletargeting:GetSegments",
+      "mobiletargeting:ListJourneys",
+      "mobiletargeting:ListTemplates",
+      "sms-voice:DescribeConfigurationSets",
+      "sms-voice:DescribeOptOutLists",
+      "sms-voice:DescribePhoneNumbers",
+      "sms-voice:DescribePools",
+      "sms-voice:DescribeProtectConfigurations",
+      "sms-voice:DescribeRegistrationAttachments",
+      "sms-voice:DescribeRegistrations",
+      "sms-voice:DescribeSenderIds",
+      "sms-voice:DescribeVerifiedDestinationNumbers",
+      "social-messaging:ListLinkedWhatsAppBusinessAccounts"
+    ]
     resources = ["*"]
   }
 }
