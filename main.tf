@@ -10,7 +10,7 @@ locals {
     namespace if !contains(var.namespace_rules, namespace)
   ]
 
-  exclusive_resource_collection_policies = setsubstract(
+  exclusive_resource_collection_policies = setsubtract(
     toset(data.datadog_integration_aws_iam_permissions_resource_collection.default.iam_permissions),
     toset(data.datadog_integration_aws_iam_permissions.default.iam_permissions)
   )
