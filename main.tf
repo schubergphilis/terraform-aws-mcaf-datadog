@@ -6,15 +6,20 @@ locals {
   datadog_resource_collection_enabled     = var.cspm_resource_collection_enabled || var.extended_resource_collection_enabled ? true : false
 
   excluded_namespaces = length(var.namespace_rules) == 0 ? null : [
-    for namespace in toset(data.datadog_integration_aws_namespace_rules.rules.namespace_rules) :
+    for namespace in toset(data.datadog_integration_aws_available_namespaces.namespaces.aws_namespaces) :
     namespace if !contains(var.namespace_rules, namespace)
   ]
+
+  exclusive_resource_collection_policies = setsubstract(
+    toset(data.datadog_integration_aws_iam_permissions_resource_collection.default.iam_permissions),
+    toset(data.datadog_integration_aws_iam_permissions.default.iam_permissions)
+  )
 }
 
-check "namespace_rules" {
+check "namespaces" {
   assert {
-    condition     = alltrue([for namespace in var.namespace_rules : contains(data.datadog_integration_aws_namespace_rules.rules.namespace_rules, namespace)])
-    error_message = "One or more provided namespaces in var.namespace_rules are invalid. Use data.datadog_integration_aws_namespace_rules to get the list of valid namespaces."
+    condition     = alltrue([for namespace in var.namespace_rules : contains(data.datadog_integration_aws_available_namespaces.namespaces.aws_namespaces, namespace)])
+    error_message = "One or more provided namespaces in var.namespace_rules are invalid. Use data.datadog_integration_aws_available_namespaces to get the list of valid namespaces."
   }
 }
 
@@ -24,7 +29,7 @@ data "http" "datadog_forwarder_yaml_url" {
   url = "https://datadog-cloudformation-template.s3.amazonaws.com/aws/forwarder/${var.log_forwarder_version}.yaml"
 }
 
-data "datadog_integration_aws_namespace_rules" "rules" {}
+data "datadog_integration_aws_available_namespaces" "namespaces" {}
 
 resource "datadog_integration_aws_external_id" "default" {}
 
@@ -117,7 +122,7 @@ data "aws_iam_policy_document" "datadog_integration_policy" {
 data "aws_iam_policy_document" "datadog_resource_collection_policy" {
   #https://docs.datadoghq.com/integrations/amazon_web_services/#aws-resource-collection-iam-policy
   statement {
-    actions   = data.datadog_integration_aws_iam_permissions_resource_collection.default.iam_permissions
+    actions   = local.exclusive_resource_collection_policies
     resources = ["*"]
   }
 }
