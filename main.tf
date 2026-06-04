@@ -10,7 +10,7 @@ locals {
     namespace if !contains(var.namespace_rules, namespace)
   ]
 
-  exclusive_resource_collection_policies = setsubtract(
+  exclusive_resource_collection_permissions = setsubtract(
     toset(data.datadog_integration_aws_iam_permissions_resource_collection.default.iam_permissions),
     toset(data.datadog_integration_aws_iam_permissions.default.iam_permissions)
   )
@@ -122,7 +122,7 @@ data "aws_iam_policy_document" "datadog_integration_policy" {
 data "aws_iam_policy_document" "datadog_resource_collection_policy" {
   #https://docs.datadoghq.com/integrations/amazon_web_services/#aws-resource-collection-iam-policy
   statement {
-    actions   = local.exclusive_resource_collection_policies
+    actions   = local.exclusive_resource_collection_permissions
     resources = ["*"]
   }
 }
