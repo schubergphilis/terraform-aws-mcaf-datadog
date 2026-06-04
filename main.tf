@@ -12,7 +12,7 @@ locals {
 
   exclusive_resource_collection_permissions = setsubtract(
     toset(data.datadog_integration_aws_iam_permissions_resource_collection.default.iam_permissions),
-    toset(data.datadog_integration_aws_iam_permissions.default.iam_permissions)
+    toset(data.datadog_integration_aws_iam_permissions_standard.default.iam_permissions)
   )
 }
 
@@ -107,14 +107,14 @@ data "aws_iam_policy_document" "datadog_integration_assume_role" {
   }
 }
 
-data "datadog_integration_aws_iam_permissions" "default" {}
+data "datadog_integration_aws_iam_permissions_standard" "default" {}
 
 data "datadog_integration_aws_iam_permissions_resource_collection" "default" {}
 
 data "aws_iam_policy_document" "datadog_integration_policy" {
   #https://docs.datadoghq.com/integrations/amazon_web_services/#aws-integration-iam-policy
   statement {
-    actions   = data.datadog_integration_aws_iam_permissions.default.iam_permissions
+    actions   = data.datadog_integration_aws_iam_permissions_standard.default.iam_permissions
     resources = ["*"]
   }
 }
