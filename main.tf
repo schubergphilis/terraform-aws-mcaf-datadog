@@ -6,15 +6,15 @@ locals {
   datadog_resource_collection_enabled     = var.cspm_resource_collection_enabled || var.extended_resource_collection_enabled ? true : false
 
   excluded_namespaces = length(var.namespace_rules) == 0 ? null : [
-    for namespace in toset(data.datadog_integration_aws_namespace_rules.rules.namespace_rules) :
+    for namespace in toset(data.datadog_integration_aws_available_namespaces.namespaces.aws_namespaces) :
     namespace if !contains(var.namespace_rules, namespace)
   ]
 }
 
-check "namespace_rules" {
+check "namespaces" {
   assert {
-    condition     = alltrue([for namespace in var.namespace_rules : contains(data.datadog_integration_aws_namespace_rules.rules.namespace_rules, namespace)])
-    error_message = "One or more provided namespaces in var.namespace_rules are invalid. Use data.datadog_integration_aws_namespace_rules to get the list of valid namespaces."
+    condition     = alltrue([for namespace in var.namespace_rules : contains(data.datadog_integration_aws_available_namespaces.namespaces.aws_namespaces, namespace)])
+    error_message = "One or more provided namespaces in var.namespace_rules are invalid. Use data.datadog_integration_aws_available_namespaces to get the list of valid namespaces."
   }
 }
 
@@ -24,7 +24,7 @@ data "http" "datadog_forwarder_yaml_url" {
   url = "https://datadog-cloudformation-template.s3.amazonaws.com/aws/forwarder/${var.log_forwarder_version}.yaml"
 }
 
-data "datadog_integration_aws_namespace_rules" "rules" {}
+data "datadog_integration_aws_available_namespaces" "namespaces" {}
 
 resource "datadog_integration_aws_external_id" "default" {}
 
@@ -102,22 +102,85 @@ data "aws_iam_policy_document" "datadog_integration_assume_role" {
   }
 }
 
-data "datadog_integration_aws_iam_permissions" "default" {}
-
-data "datadog_integration_aws_iam_permissions_resource_collection" "default" {}
+data "datadog_integration_aws_iam_permissions_standard" "default" {}
 
 data "aws_iam_policy_document" "datadog_integration_policy" {
   #https://docs.datadoghq.com/integrations/amazon_web_services/#aws-integration-iam-policy
   statement {
-    actions   = data.datadog_integration_aws_iam_permissions.default.iam_permissions
+    actions   = data.datadog_integration_aws_iam_permissions_standard.default.iam_permissions
     resources = ["*"]
   }
 }
 
 data "aws_iam_policy_document" "datadog_resource_collection_policy" {
   #https://docs.datadoghq.com/integrations/amazon_web_services/#aws-resource-collection-iam-policy
+  #checkov:skip=CKV_AWS_111: Resource wildcard cannot be scoped because it's not known beforehand which exact resources datadog need to be able to scrape
+  #checkov:skip=CKV_AWS_356: Policy cannot be more scoped down, this is the recommended policy by datadog
   statement {
-    actions   = data.datadog_integration_aws_iam_permissions_resource_collection.default.iam_permissions
+    actions = [
+      "amplify:ListApps",
+      "amplify:ListArtifacts",
+      "amplify:ListBackendEnvironments",
+      "amplify:ListBranches",
+      "amplify:ListDomainAssociations",
+      "amplify:ListJobs",
+      "amplify:ListWebhooks",
+      "appstream:DescribeAppBlockBuilders",
+      "appstream:DescribeAppBlocks",
+      "appstream:DescribeApplications",
+      "appstream:DescribeFleets",
+      "appstream:DescribeImageBuilders",
+      "appstream:DescribeImages",
+      "appstream:DescribeStacks",
+      "batch:DescribeJobQueues",
+      "batch:DescribeSchedulingPolicies",
+      "batch:ListSchedulingPolicies",
+      "deadline:GetBudget",
+      "deadline:GetLicenseEndpoint",
+      "deadline:GetQueue",
+      "deadline:ListBudgets",
+      "deadline:ListFarms",
+      "deadline:ListFleets",
+      "deadline:ListLicenseEndpoints",
+      "deadline:ListMonitors",
+      "deadline:ListQueues",
+      "deadline:ListWorkers",
+      "identitystore:DescribeGroup",
+      "identitystore:DescribeGroupMembership",
+      "imagebuilder:GetContainerRecipe",
+      "imagebuilder:GetDistributionConfiguration",
+      "imagebuilder:GetImageRecipe",
+      "imagebuilder:GetInfrastructureConfiguration",
+      "imagebuilder:GetLifecyclePolicy",
+      "imagebuilder:GetWorkflow",
+      "imagebuilder:ListComponents",
+      "imagebuilder:ListContainerRecipes",
+      "imagebuilder:ListDistributionConfigurations",
+      "imagebuilder:ListImagePipelines",
+      "imagebuilder:ListImageRecipes",
+      "imagebuilder:ListImages",
+      "imagebuilder:ListInfrastructureConfigurations",
+      "imagebuilder:ListLifecyclePolicies",
+      "imagebuilder:ListWorkflows",
+      "mobiletargeting:GetApps",
+      "mobiletargeting:GetCampaigns",
+      "mobiletargeting:GetChannels",
+      "mobiletargeting:GetEventStream",
+      "mobiletargeting:GetRecommenderConfigurations",
+      "mobiletargeting:GetSegments",
+      "mobiletargeting:ListJourneys",
+      "mobiletargeting:ListTemplates",
+      "sms-voice:DescribeConfigurationSets",
+      "sms-voice:DescribeOptOutLists",
+      "sms-voice:DescribePhoneNumbers",
+      "sms-voice:DescribePools",
+      "sms-voice:DescribeProtectConfigurations",
+      "sms-voice:DescribeRegistrationAttachments",
+      "sms-voice:DescribeRegistrations",
+      "sms-voice:DescribeSenderIds",
+      "sms-voice:DescribeVerifiedDestinationNumbers",
+      "social-messaging:ListLinkedWhatsAppBusinessAccounts"
+    ]
     resources = ["*"]
   }
 }
