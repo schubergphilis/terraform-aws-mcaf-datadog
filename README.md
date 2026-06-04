@@ -39,9 +39,9 @@
 | [aws_iam_policy_document.datadog_integration_assume_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.datadog_integration_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.datadog_resource_collection_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [datadog_integration_aws_available_namespaces.namespaces](https://registry.terraform.io/providers/datadog/datadog/latest/docs/data-sources/integration_aws_available_namespaces) | data source |
 | [datadog_integration_aws_iam_permissions.default](https://registry.terraform.io/providers/datadog/datadog/latest/docs/data-sources/integration_aws_iam_permissions) | data source |
 | [datadog_integration_aws_iam_permissions_resource_collection.default](https://registry.terraform.io/providers/datadog/datadog/latest/docs/data-sources/integration_aws_iam_permissions_resource_collection) | data source |
-| [datadog_integration_aws_namespace_rules.rules](https://registry.terraform.io/providers/datadog/datadog/latest/docs/data-sources/integration_aws_namespace_rules) | data source |
 | [http_http.datadog_forwarder_yaml_url](https://registry.terraform.io/providers/hashicorp/http/latest/docs/data-sources/http) | data source |
 
 ## Inputs
